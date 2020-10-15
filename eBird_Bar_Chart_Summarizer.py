@@ -4,6 +4,7 @@ from pathlib import Path
 
 import argparse
 import csv
+import json
 
 # Isolation -- use different libraries for different projects
 # Reproducibility -- never accidentally change the code you are running
@@ -157,20 +158,39 @@ def species_dict_from_park_dict(sp_list, m_dict):
 
 def write_csv_file(file_location, sp_data):
     """Records supplied species oriented dict to a CSV at the supplied location."""
-    field_names = []
+    park_names = []
     for bird in sp_data.values():
         for park in bird.keys():
-            if not park in field_names:
-                field_names.append(park)
-    field_names.insert(0, 'Species')
+            if not park in park_names:
+                park_names.append(park)
+    park_names.insert(0, 'Species')
 
     with open(file_location, 'w', newline='') as out_file:
-        writer = csv.writer(out_file, field_names)
-        writer.writerow(field_names)
+        writer = csv.writer(out_file, park_names)
+        writer.writerow(park_names)
         for bird_dict in sp_data:
             p_vals = list(sp_data[bird_dict].values())
             p_vals.insert(0, bird_dict)
             writer.writerow(p_vals)
+
+
+def write_json_file(file_location, sp_data):
+    '''Records supplied species oriented dict to a JSON file at the supplied location'''
+    data_dict = {}
+    park_names = []
+    for bird in sp_data.values():
+        for park in bird.keys():
+            if not park in park_names:
+                park_names.append(park)
+        break    
+    park_names = sorted(park_names)
+    data_dict['Park Names'] = park_names
+    
+    for bird in sp_data:
+        data_dict[bird] = sp_data[bird]
+    
+    with open(file_location, 'w') as out_file:
+        json.dump(data_dict, out_file)
 
 
 def sort_species_dict(sp_dict):
@@ -210,7 +230,8 @@ def main():
 
     sorted_master_dict = sort_species_dict(master_species_dict)
 
-    write_csv_file(out_file_path, sorted_master_dict)
+    #write_csv_file(out_file_path, sorted_master_dict)
+    write_json_file(out_file_path, sorted_master_dict)
     print(f"Summary file written for {len(species_list)} species and {len(file_list)} hotspots.")
 
 
