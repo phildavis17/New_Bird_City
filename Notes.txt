@@ -1,0 +1,38 @@
+Master Dict
+{
+    'Park Names': ('Park3', 'Park7', 'Park9'...),
+    'Bird 1': {'Park3': 0.53, 'Park7': 0.21, 'Park9': 0.0},
+    'Bird 2': {'Park3': 0.81, 'Park7': 0.76, 'Park9': 0.84},
+    'Bird 3': {'Park3': 0.04, 'Park7': 0.0, 'Park9': 0.01},
+    'Bird 4': {'Park3': 0.021, 'Park7': 0.72, 'Park9': 0.32},
+    ...
+}
+
+
+Route Dict
+{
+    '001000101':{
+        'Park_Names': ('Park3', 'Park7', 'Park9'),
+        'Birds':{
+            'Bird 1': 0.823,
+            'Bird 2': 0.244,
+            'Bird 3': 0.002,
+        },
+        'Specialties':{
+            'Park3': {'Bird 1': 0.28, 'Bird 2': 0.01, 'Bird 3': .03},
+            'Park7': {'Bird 4': 0.367},
+            'Park9': {'Bird 2': .04}
+        }
+    }    
+}
+
+
+Process:
+1. Read CSV, create Master Dict
+2. Generate routes as needed
+    a. check to see if route is already in route Dict
+    b. if so, load it, if not create it
+        -generate bird odds
+        -calculate specialties
+
+I need some way to create a view into the master dict, so i don't have to duplicate the same data a billion times.
