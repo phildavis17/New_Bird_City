@@ -4,11 +4,14 @@ import json
 MASTER_JSON = R'C:\Documents\Code\New_Bird_City\BK_May.json'
 
 def parse_json(file_location):
-    '''Reads a json file, and populates a dict.'''
-    pass
+    '''Reads a json file, and returns a bird dict.'''
+    with open(file_location, 'r') as in_file:
+        in_dict = json.load(in_file)
+        in_dict['Park Names'] = tuple(in_dict['Park Names'])
+    return in_dict
+        
 
-
-def create_route(parks):
+def build_route(parks):
     '''Generates data describing a route between parks.'''
     pass
 
@@ -18,9 +21,12 @@ def log_route_data(route_dict):
     pass
 
 
-def route_birds(parks):
+def route_birds(parks, master_dict):
     '''Returns a bird dict trimmed to the supplied parks.'''
-    pass
+    del master_dict['Park Names']
+    for bird in master_dict:
+        master
+    
 
 
 def calculate_odds(route_dict):
@@ -45,3 +51,8 @@ def create_route_name(in_parks, all_parks):
 
 
 
+def test():
+    parse_json(MASTER_JSON)
+
+
+test()
