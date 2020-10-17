@@ -10,9 +10,6 @@ def parse_json(file_location):
         in_dict = json.load(in_file)
         in_dict['Park Names'] = tuple(in_dict['Park Names'])
     return in_dict
-        
-
-
 
 
 def random_route(count, all_parks):
@@ -22,8 +19,6 @@ def random_route(count, all_parks):
         random.shuffle(park_list)
         route.append(park_list.pop())
     return route
-
-
 
 
 def route_birds(parks, master_dict):
@@ -53,8 +48,6 @@ def calculate_probabilities(route_dict):
     return prob_dict
 
 
-
-
 def find_specialties(route_dict):
     '''Finds specialties at each park on a route.'''
     specialties = {}
@@ -68,9 +61,6 @@ def find_specialties(route_dict):
                 sp_dict[park] = round(this_bird[park] - average, 5)
         specialties[bird] = sp_dict
     return specialties
-
-
-
 
 
 def create_route_name(in_parks, all_parks):
@@ -98,6 +88,7 @@ def route_is_logged(route_file, route):
 def log_route_data(route_dict):
     '''Logs route information to a JSON file.'''
     pass
+
 
 def test():
     master_dict = parse_json(MASTER_JSON)
