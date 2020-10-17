@@ -2,7 +2,7 @@ import csv
 import json
 import random
 
-MASTER_JSON = R'D:\Douments\Code\New_Bird_City\BK_May.json'
+MASTER_JSON = R'C:\Documents\Code\New_Bird_City\BK_May.json'
 
 def parse_json(file_location):
     '''Reads a json file, and returns a bird dict.'''
@@ -51,7 +51,7 @@ def calculate_probabilities(route_dict):
 def find_specialties(route_dict):
     '''Finds specialties at each park on a route.'''
     specialties = {}
-    del route_dict['Park Names']
+    # del route_dict['Park Names']
     for bird in route_dict:
         this_bird = route_dict[bird]
         average = sum(this_bird.values())/len(this_bird.values())
@@ -74,9 +74,18 @@ def create_route_name(in_parks, all_parks):
     return rt_name
 
 
-def build_route(parks, all_parks):
+def build_route(master_dict, route_parks):
     '''Generates data describing a route between parks.'''
-    pass
+    #print('Park Names' in master_dict)
+
+    route = {}
+    all_park_names = master_dict['Park Names']
+    route_dict = route_birds(route_parks, master_dict)
+    route['Route Index'] = create_route_name(route_parks, all_park_names)
+    route['Parks'] =  tuple(sorted(list(route_parks)))
+    route['Probabilities'] = calculate_probabilities(route_dict)
+    route['Specialties'] = find_specialties(route_dict)
+    return route
 
 
 def route_is_logged(route_file, route):
@@ -93,12 +102,11 @@ def log_route_data(route_dict):
 def test():
     master_dict = parse_json(MASTER_JSON)
     park_names = master_dict['Park Names']
-    route_parks = random_route(5, park_names)
-    rt_dict = route_birds(route_parks, master_dict)
-    
-    print(rt_dict['Park Names'])
-    print(calculate_probabilities(rt_dict))
-
-
+    #print(master_dict['Park Names'])
+    route_parks = random_route(2, park_names)
+    new_route = build_route(master_dict, route_parks)
+    for key in new_route:
+        print(key)
+        print(new_route[key])
 
 test()
