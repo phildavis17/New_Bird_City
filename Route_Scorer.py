@@ -3,6 +3,7 @@ import json
 import random
 
 MASTER_JSON = R'C:\Documents\Code\New_Bird_City\BK_May.json'
+ESCAPED_KEYS = ['Park Names']
 
 def parse_json(file_location):
     '''Reads a json file, and returns a bird dict.'''
@@ -24,8 +25,9 @@ def random_route(count, all_parks):
 def route_birds(parks, master_dict):
     '''Returns a bird dict trimmed to the supplied parks.'''
     route_dict = {}
-    del master_dict['Park Names']
+    #del master_dict['Park Names']
     for bird in master_dict:
+        if bird in ESCAPED_KEYS: continue
         temp_dict = {}
         for park in master_dict[bird]:
             if park in parks:
@@ -39,8 +41,9 @@ def route_birds(parks, master_dict):
 def calculate_probabilities(route_dict):
     '''Calculates the overall odds of seeing each birds on a specifies route.'''
     prob_dict = {}
-    del route_dict['Park Names']
+    #del route_dict['Park Names']
     for bird in route_dict:
+        if bird in ESCAPED_KEYS: continue
         prob = 1
         for obs in route_dict[bird].values():
             prob *= 1-obs
@@ -103,7 +106,7 @@ def test():
     master_dict = parse_json(MASTER_JSON)
     park_names = master_dict['Park Names']
     #print(master_dict['Park Names'])
-    route_parks = random_route(2, park_names)
+    route_parks = random_route(3, park_names)
     new_route = build_route(master_dict, route_parks)
     for key in new_route:
         print(key)
