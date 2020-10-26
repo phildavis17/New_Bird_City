@@ -1,8 +1,10 @@
+from collections import defaultdict
+
 import csv
 import json
 import random
 
-MASTER_JSON = R'C:\Documents\Code\New_Bird_City\BK_May.json'
+MASTER_JSON = R'D:\Douments\Code\New_Bird_City\BK_May.json'
 ESCAPED_KEYS = ['Park Names']
 
 def parse_json(file_location):
@@ -56,6 +58,7 @@ def find_specialties(route_dict):
     specialties = {}
     # del route_dict['Park Names']
     for bird in route_dict:
+        if bird in ESCAPED_KEYS: continue
         this_bird = route_dict[bird]
         average = sum(this_bird.values())/len(this_bird.values())
         sp_dict = {}
@@ -102,14 +105,47 @@ def log_route_data(route_dict):
     pass
 
 
+def route_compare(base_route, alt_route):
+    '''Takes two route bird dictionaries and returns a comparison dict with the differences between routes.'''
+
+    # Route_dict:
+    #   -Index: string
+    #   -Parks: tuple
+    #   -Probabilites: dictionary
+    #   -Specialtes: dictionary
+
+    #base_probs = base_route['Probabilites']
+    
+    
+    
+    base_probs = defaultdict(float)
+    for bird, probability in base_route['Probabilities'].items():
+        base_probs[bird] = probability
+    
+    alt_probs = defaultdict(float)
+    for bird, probability in alt_route['Probabilities'].items():
+        alt_probs[bird] = probability
+
+    all_birds = base_probs.keys() | alt_probs.keys()
+
+    # It's like this because we are currently only using defailt dicts within this method.
+    
+    comparison = {}
+    for bird in all_birds:
+        comparison[bird] = round(base_probs[bird] - alt_probs[bird], 5)
+    
+    return comparison   
+
+
+
 def test():
     master_dict = parse_json(MASTER_JSON)
     park_names = master_dict['Park Names']
     #print(master_dict['Park Names'])
-    route_parks = random_route(3, park_names)
-    new_route = build_route(master_dict, route_parks)
-    for key in new_route:
-        print(key)
-        print(new_route[key])
-
+    route_parks_1 = random_route(3, park_names)
+    route_parks_2 = random_route(3, park_names)
+    A_route = build_route(master_dict, route_parks_1)
+    B_route = build_route(master_dict, route_parks_2)
+    print(route_compare(A_route, B_route))
+    
 test()
