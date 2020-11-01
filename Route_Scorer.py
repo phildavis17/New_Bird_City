@@ -116,7 +116,8 @@ def route_compare(base_route, alt_route):
 
     #base_probs = base_route['Probabilites']
     
-    
+    # fine, but not ideal!
+    #   -This is creating a second copy of the info in these dicts, which is an opportunity to make a mistake!
     
     base_probs = defaultdict(float)
     for bird, probability in base_route['Probabilities'].items():
@@ -134,6 +135,9 @@ def route_compare(base_route, alt_route):
     for bird in all_birds:
         comparison[bird] = round(base_probs[bird] - alt_probs[bird], 5)
     
+    # to do:
+    #   -sort by tax order
+
     return comparison   
 
 
