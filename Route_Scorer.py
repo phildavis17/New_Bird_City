@@ -4,7 +4,7 @@ import csv
 import json
 import random
 
-MASTER_JSON = R'D:\Douments\Code\New_Bird_City\BK_May.json'
+MASTER_JSON = R'C:\Documents\Code\New_Bird_City\BK_May.json'
 ESCAPED_KEYS = ['Park Names']
 
 def parse_json(file_location):
@@ -141,6 +141,9 @@ def route_compare(base_route, alt_route):
     return comparison   
 
 
+def net_compare(comp):
+    return round(sum(comp.values()), 5)
+
 
 def test():
     master_dict = parse_json(MASTER_JSON)
@@ -150,6 +153,7 @@ def test():
     route_parks_2 = random_route(3, park_names)
     A_route = build_route(master_dict, route_parks_1)
     B_route = build_route(master_dict, route_parks_2)
-    print(route_compare(A_route, B_route))
+    comp_a = route_compare(A_route, B_route)
+    print(net_compare(comp_a))
     
 test()
