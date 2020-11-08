@@ -1,0 +1,9 @@
+Here's how this thing is supposed to work.
+
+There are 2 parts. Part 1 is a tool that reads downloaded eBird Bar Chart data, and summarizes the data from multiple parks for a given month.
+Part 2 is a tool that uses that summarized data to give you info about different possible routes between the parks you included in your analysis.
+
+
+Bar Chart Summarizer
+
+
