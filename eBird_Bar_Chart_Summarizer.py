@@ -184,11 +184,14 @@ def write_json_file(file_location, sp_data):
                 park_names.append(park)
         break    
     park_names = sorted(park_names)
-    data_dict['Park Names'] = park_names
     
+    bird_dict = {}
     for bird in sp_data:
-        data_dict[bird] = sp_data[bird]
+        bird_dict[bird] = sp_data[bird]
     
+    data_dict['Park Names'] = park_names
+    data_dict['Birds'] = bird_dict
+
     with open(file_location, 'w') as out_file:
         json.dump(data_dict, out_file)
 
