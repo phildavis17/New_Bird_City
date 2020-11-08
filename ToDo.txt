@@ -7,6 +7,7 @@ Route Scorer
 -refactor to use defaultdict from the jump
 -refactor to use Decimal
 -fix JSON topology
+-make the comparison sort by taxonomic order
 
 
 Testing

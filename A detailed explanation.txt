@@ -5,5 +5,14 @@ Part 2 is a tool that uses that summarized data to give you info about different
 
 
 Bar Chart Summarizer
+The overall goal of this script is to intake raw barchart data downloaded from eBird, and convert it to a CSV or a JSON file that is more tailored 
+to the analysis we are trying to perform. In order to do this, it has to go through several steps.
 
+1. Locate and Read eBird data
+
+
+
+
+
+Route Analysis
 

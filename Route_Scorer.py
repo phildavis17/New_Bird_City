@@ -1,4 +1,5 @@
 from collections import defaultdict
+from decimal import *
 
 import csv
 import json
@@ -16,6 +17,7 @@ def parse_json(file_location):
 
 
 def random_route(count, all_parks):
+    '''Generate a random route from the supplied park list.'''
     park_list = list(all_parks)
     route = []
     for i in range(count):
@@ -24,7 +26,7 @@ def random_route(count, all_parks):
     return route
 
 
-def route_birds(parks, master_dict):
+def route_birds(parks, master_dict):  # <--------------------------------------Refactor to use default dicts
     '''Returns a bird dict trimmed to the supplied parks.'''
     route_dict = {}
     #del master_dict['Park Names']
@@ -157,3 +159,5 @@ def test():
     print(net_compare(comp_a))
     
 test()
+
+
