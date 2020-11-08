@@ -1,11 +1,13 @@
 Master Dict
 {
     'Park Names': ('Park3', 'Park7', 'Park9'...),
-    'Bird 1': {'Park3': 0.53, 'Park7': 0.21, 'Park9': 0.0},
-    'Bird 2': {'Park3': 0.81, 'Park7': 0.76, 'Park9': 0.84},
-    'Bird 3': {'Park3': 0.04, 'Park7': 0.0, 'Park9': 0.01},
-    'Bird 4': {'Park3': 0.021, 'Park7': 0.72, 'Park9': 0.32},
-    ...
+    'Birds':{
+        'Bird 1': {'Park3': 0.53, 'Park7': 0.21, 'Park9': 0.0},
+        'Bird 2': {'Park3': 0.81, 'Park7': 0.76, 'Park9': 0.84},
+        'Bird 3': {'Park3': 0.04, 'Park7': 0.0, 'Park9': 0.01},
+        'Bird 4': {'Park3': 0.021, 'Park7': 0.72, 'Park9': 0.32},
+        ...
+    }
 }
 
 

@@ -1,6 +1,13 @@
+Bar Chart Summarizer
+-choose csv or JSON
+-update JSON format
+-refactor to use Decimal
+
 Route Scorer
--convert to use defaultdict
+-refactor to use defaultdict from the jump
+-refactor to use Decimal
+-fix JSON topology
 
 
 Testing
--
+-do any of it.
