@@ -158,6 +158,9 @@ def test():
     comp_a = route_compare(A_route, B_route)
     print(net_compare(comp_a))
     
-test()
+
+if name == if __name__ == "__main__":
+    test()
+
 
 
