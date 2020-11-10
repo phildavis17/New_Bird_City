@@ -37,22 +37,14 @@ def random_route(master_dict, num):
 class Route:
     '''A class to handle routes between parks.'''
     
-    parks = ()
-    index = ''
-    birds = {}
-    specialties = {}
-    score = 0
-    total_species = 0
-    master_hash = ''
-
     def __init__(self, master_dict, park_names):
         '''It's an init funtion. It populates variables.'''
         self.parks = tuple(sorted(park_names))
         self.index = self._generate_index(master_dict['Park Names'])
-        #self.master_hash = self.generate_master_hash(master_dict)
+        self.context_hash = self._generate_context_hash(master_dict)
         self.birds = self._build_route_dict(master_dict['Birds'])
         self.specialties = self._find_specialties(master_dict['Birds'])
-        #self.score = sum(self.birds.values())
+        self.score = sum(self.birds.values())
         self.total_species = len(self.birds)
 
     def __len__(self):
@@ -62,12 +54,8 @@ class Route:
         rep_str = 'A Route object for parks: {}'
         return rep_str.format(self.parks)
 
-    #def __str__(self):
-    #    pass
-        
-
     def __eq__(self, other_route):
-        if other_route.index == self.index and other_route.master_hash == self.master_hash:
+        if other_route.index == self.index and other_route.context_hash == self.context_hash:
             return True
         return False
         
@@ -81,7 +69,7 @@ class Route:
                 rt_name += '0'
         return rt_name
 
-    def generate_master_hash(self, master_dict):
+    def _generate_context_hash(self, master_dict):
         '''Creates a hash from the master dict, for use in determining route equality.'''
         hasher = hashlib.sha256()
         hasher.update(str(master_dict).encode())
@@ -118,7 +106,11 @@ class Route:
 
     def compare(self, alt_route):
         '''Generates a dictionary containing the difference in odds between routes for each bird on those routes.'''
-        pass
+        all_birds = self.birds.keys() | alt_route.birds.keys()
+        comparison = {}
+        for bird in all_birds:
+            comparison[bird] = round(base_probs[bird] - alt_probs[bird], 5)
+        return comparison
 
 
 
