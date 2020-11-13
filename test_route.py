@@ -25,7 +25,7 @@ json_chunk_b = '''{
 def route_fixture():
     '''Test Route creation with fixed data.'''
     test_data = route.build_master_dict(json_chunk_a)
-    return route.Route(test_data, json_chunk_a['Park Names'])
+    return route.Route(test_data, test_data['Park Names'])
 
 
 def test_route_fixture(route_fixture):
@@ -47,7 +47,25 @@ def test_inequality():
     route_b = route.Route(test_data_b, test_data_b['Park Names'])
     assert route_a != route_b
 
+def test_compare():
+    pass
 
+
+def test_compare_concise():
+    pass
 
 if __name__ == "__main__":
     pytest.main()
+    test_data_a = route.build_master_dict(json_chunk_a)
+    test_data_b = route.build_master_dict(json_chunk_b)
+    route_a = route.Route(test_data_a, test_data_a['Park Names'])
+    route_b = route.Route(test_data_b, test_data_b['Park Names'])
+    for bird in route_a.birds.items():
+        print(bird)
+    for bird in route_b.birds.items():
+        print(bird)
+    print(route_a.compare(route_b))
+    print(route_b.compare(route_a))
+    print(route_a.compare_concise(route_b))
+    print(route_a.score)
+    print(route_b.score)
