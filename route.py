@@ -44,7 +44,7 @@ class Route:
         self.context_hash = self._generate_context_hash(master_dict)
         self.birds = self._build_route_dict(master_dict['Birds'])
         self.specialties = self._find_specialties(master_dict['Birds'])
-        self.score = sum(self.birds.values())
+        self.score = round(sum(self.birds.values()), 5)
         self.total_species = len(self.birds)
 
     def __len__(self):
@@ -82,7 +82,7 @@ class Route:
             prob = 1
             for park in master_dict[bird]:
                 if park in self.parks:
-                    prob *= master_dict[bird][park] - 1
+                    prob *= 1 - master_dict[bird][park]
             if prob != 1:
                 route_dict[bird] = round(1 - prob, 5)
         return route_dict
@@ -109,10 +109,16 @@ class Route:
         all_birds = self.birds.keys() | alt_route.birds.keys()
         comparison = {}
         for bird in all_birds:
-            comparison[bird] = round(base_probs[bird] - alt_probs[bird], 5)
+            comparison[bird] = round(self.birds[bird] - alt_route.birds[bird], 5)
         return comparison
+    
+    def compare_concise(self, alt_route):
+        '''Reduces a route comparison to a single number.'''
+        comp = self.compare(alt_route)
+        return sum(comp.values())
 
-
+    def compare_verbose(self, alt_route):
+        pass
 
 
 def test():
