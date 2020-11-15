@@ -35,7 +35,6 @@ def test_route_fixture(route_fixture):
 def test_dunders(route_fixture):
     assert len(route_fixture) == 2
 
-
     
 def test_summary_data(route_fixture):
     assert route_fixture.birds['Brant'] == 0.87347
@@ -48,11 +47,17 @@ def test_inequality():
     assert route_a != route_b
 
 def test_compare():
-    pass
+    test_data_a = route.build_master_dict(json_chunk_a)
+    test_data_b = route.build_master_dict(json_chunk_b)
+    route_a = route.Route(test_data_a, test_data_a['Park Names'])
+    route_b = route.Route(test_data_b, test_data_b['Park Names'])
+    assert route_a.compare(route_b) == {'Snow Goose': 0.0, 'Canada Goose': -0.19037, 'Black-bellied Whistling-Duck': 0.08276, 'Brant': -0.09112, 'Wood Duck': -0.55455, 'Mute Swan': -0.74535}
 
 
-def test_compare_concise():
-    pass
+def test_random_route():
+    rand_route = route.random_route(route.MASTER_ROUTE, 3)
+    assert rand_route is not None
+
 
 if __name__ == "__main__":
     pytest.main()
@@ -66,6 +71,7 @@ if __name__ == "__main__":
         print(bird)
     print(route_a.compare(route_b))
     print(route_b.compare(route_a))
-    print(route_a.compare_concise(route_b))
-    print(route_a.score)
-    print(route_b.score)
+
+    rand_route = route.random_route(route.MASTER_ROUTE, 3)
+    print(rand_route.parks)
+
