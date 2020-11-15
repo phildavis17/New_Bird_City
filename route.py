@@ -10,12 +10,14 @@ import random
 MASTER_JSON = R'D:\Douments\Code\New_Bird_City\BK_May_2.json'  # Desktop Version
 #MASTER_JSON = R'C:\Documents\Code\New_Bird_City\BK_May_2.json'  # Laptop Version
 
+
 def parse_json(file_location):
     '''Reads a json file, and returns a bird dict.'''
     with open(file_location, 'r') as in_file:
         in_dict = json.load(in_file)
-        in_dict['Park Names'] = tuple(in_dict['Park Names'])
+        #in_dict['Park Names'] = tuple(in_dict['Park Names'])
     return in_dict
+
 
 def build_master_dict(data_string):
     '''Turn a string into a properly formatted dict for analysis.'''
@@ -27,11 +29,22 @@ def build_master_dict(data_string):
 def random_route(master_dict, num):
     '''Creates a random route from the supplied parks.'''
     park_list = list(master_dict['Park Names'])
-    route = []
+    route_parks = []
     for i in range(num):
         random.shuffle(park_list)
-        route.append(park_list.pop())
-    return route
+        route_parks.append(park_list.pop())    
+    return Route(master_dict, route_parks)
+
+
+def route_from_index(master_dict, index):
+    '''Creates a route from a given index'''
+    route_parks = []
+    if len(index) != len(master_dict['Park Names']):
+        raise IndexError('Index does not match parks')
+    for i, bit in enumerate(index):
+        if index[i] == '1':
+            route_parks.append(master_dict['Park Names'][i])
+    return Route(master_dict, route_parks)
 
 
 class Route:
@@ -111,14 +124,13 @@ class Route:
         for bird in all_birds:
             comparison[bird] = round(self.birds[bird] - alt_route.birds[bird], 5)
         return comparison
-    
-    def compare_concise(self, alt_route):
-        '''Reduces a route comparison to a single number.'''
-        comp = self.compare(alt_route)
-        return sum(comp.values())
 
     def compare_verbose(self, alt_route):
         pass
+
+
+with open(MASTER_JSON, 'r') as in_file:
+        MASTER_ROUTE = build_master_dict(in_file.read())
 
 
 def test():
