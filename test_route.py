@@ -58,6 +58,8 @@ def test_random_route():
     rand_route = route.random_route(route.MASTER_ROUTE, 3)
     assert rand_route is not None
 
+def test_specialties():
+    pass
 
 if __name__ == "__main__":
     pytest.main()
