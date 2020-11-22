@@ -110,11 +110,11 @@ class Route:
                     this_bird[park] = master_dict[bird][park]
 
             average = sum(this_bird.values())/len(this_bird.values())
-            sp_dict = {}
+            specialties_dict = {}
             for park in this_bird:
                 if this_bird[park] > average:
-                    sp_dict[park] = round(this_bird[park] - average, 5)
-            specialties[bird] = sp_dict
+                    specialties_dict[park] = round(this_bird[park] - average, 5)
+            specialties[bird] = specialties_dict
         return specialties
 
     def compare(self, alt_route):
@@ -136,9 +136,11 @@ with open(MASTER_JSON, 'r') as in_file:
 def test():
     master_data = parse_json(MASTER_JSON)
     #print(master_data)
-    test_route = Route(master_data, random_route(master_data, 3))
-    print(test_route)
-
+    test_route = random_route(master_data, 3)
+    print(test_route.parks)
+    print(test_route.score)
+    print(test_route.total_species)
+    
 
 if __name__ == "__main__":
     test()
