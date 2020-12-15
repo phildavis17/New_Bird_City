@@ -1,0 +1,97 @@
+Question 1 - Flask Routing
+
+In order to get to information like:
+    -Analysis
+        -Trip Plan
+            -Hotspot
+            -Species
+
+I need a url something like
+
+...Analysis/<tp_index>/<hotspot>
+or
+...Analysis/<tp_inex>/<species>
+
+But how does the app know whether the second thing is a hotspot name or a species name?
+
+...Analysis/<tp_index>/hotspot/<hotspot>
+...Analysis/<tp_index>/species/<species>
+
+1. This seems similar to how actual URLs I've seen in the wild look. Is this actually the best practice?
+2. Do I need to type that whole thing into my decorator in the Routes file, or is there something clever I should be doing to nest one inside the other?
+
+
+Question 2 - Flask/App Interaction
+
+I understand that the ideal towards which to strive is to draw a line between files that contain business logic and files that allow the inputs and outputs
+of the business logic to be displayed on a webpage, but I'm not sure how to make that interaction happen. This is a hugher degree of complexity than I'm used to.
+
+...Analysis
+    # Create a variable to store the JSON of an Analysis
+    
+    -This makes sense to me because my current thinking has been focused on a single analysis
+
+...Analysis/<tp_index>
+    # create a new route object from the current analysis with the supplied index
+
+    I understand this step well enough
+
+...Analysis/<tp_index>/Species
+
+business logic
+# explains to Python how to create a Trip Plan object, and what such an object an do
+
+
+Flask Interface
+# Shows data to the use,a nd takes data from the user.
+# import trip_plan.py
+
+...Analysis/<tp_index>/compare/<other_tp>
+#create both TPs, and A.compare(B)
+
+
+
+
+TRIP PLAN OBJECT
+
+
+WHAT IS PYTHON?
+
+1. OPCODES
+2. OS?
+3. C?
+4. HIGHER LEVEL LANGUAGE
+
+WHAT HAPPENS WHEN YOU RUN PYTHON
+
+1. Take *any supplied text* 
+2. generate Abstract Syntax tree,
+3. evaluate tree to create Python opcodes
+4. 
+
+So you've created a named value:
+A = 1
+
+"A" is a variable
+
+"1" an object
+
+B = A
+
+new variable, not new object
+
+Objects know how many times they are being referred to. If they are not being referred to, they clean themselves up.
+
+"Reference Counting Garbage Collection"
+
+Objects also know their own type.
+
+Python has strong, dynamic typing
+
+F(whatever)
+
+whatever, F
+
+When a function is called:
+    -Create a new frame, with information about variables local to the function
+    -Execute the code assicated with the function, and kick the result up the stack
