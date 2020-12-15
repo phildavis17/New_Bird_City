@@ -86,8 +86,8 @@ def summarize_barchart_file(file, period):
     samp_size = []
     bird_dict = {}
     with open(file) as tsv_file:
-        park_file = csv.reader(tsv_file, dialect='excel-tab')
-        for row_num, row in enumerate(park_file):
+        hotspot_file = csv.reader(tsv_file, dialect='excel-tab')
+        for row_num, row in enumerate(hotspot_file):
             if row_num == 14:  # Sample size information is on the 14th line of eBird bar chard data
                 samp_size = list(map(float, row[p_start:p_end]))
             if row_num >= 16 and len(row):  # Occurance data starts on line 16
@@ -101,18 +101,18 @@ def summarize_barchart_file(file, period):
 def summarize_barchart_files(files, period):
     """Summarizes multiple eBird bar char data files.
 
-    Extracts park names from the names of supplied files, splitting at the first underscore. Requires filenames to take the form "Park Name_..."
+    Extracts hotspot names from the names of supplied files, splitting at the first underscore. Requires filenames to take the form "Hotspot Name_..."
     Args:
         files: A list of files to be summarized 
         period:
 
     Returns: A dict of dicts in the following format
-        {'Park 1': {'Bird1': 0.1, 'Bird2': 0.4,...}, 'Park 2': {'Bird1': 0.3, 'Bird2': 0.2,...},...}
+        {'Hotspot 1': {'Bird1': 0.1, 'Bird2': 0.4,...}, 'Hotspot 2': {'Bird1': 0.3, 'Bird2': 0.2,...},...}
     """
     master_dict = {}
     for file in files:
-        park_name = str(file.stem).split('_')[0].strip()
-        master_dict[park_name] = filter_bird_dict(summarize_barchart_file(file, period))
+        hotspot_name = str(file.stem).split('_')[0].strip()
+        master_dict[hotspot_name] = filter_bird_dict(summarize_barchart_file(file, period))
     return master_dict
 
 
@@ -138,36 +138,36 @@ def filter_bird_dict(b_dict, r_digits=5):
     return(filtered_dict)
 
 
-def species_dict_from_park_dict(sp_list, m_dict):
-    """Converts a park oriented dict to a species oriented dict.
+def species_dict_from_hotspot_dict(sp_list, m_dict):
+    """Converts a hotspot oriented dict to a species oriented dict.
     
     Returned dict will be of following format:
-        {'Bird1: {'Park1': 0.23, 'Park2': 0.42,...}, 'Bird2': {'Park1': 0.84, 'Park2': 0.77,...},...}
+        {'Bird1: {'Hotspot1': 0.23, 'Hotspot2': 0.42,...}, 'Bird2': {'Hotspot1': 0.84, 'Hotspot2': 0.77,...},...}
     """
     master_sp_dict = {}
     for species in sp_list:
         sp_dict = {}
-        for park in m_dict.keys():
-            if species in m_dict[park].keys():
-                sp_dict[park] = m_dict[park][species]
+        for hotspot in m_dict.keys():
+            if species in m_dict[hotspot].keys():
+                sp_dict[hotspot] = m_dict[hotspot][species]
             else:
-                sp_dict[park] = 0.0
+                sp_dict[hotspot] = 0.0
         master_sp_dict[species] = sp_dict
     return master_sp_dict
 
 
 def write_csv_file(file_location, sp_data):
     """Records supplied species oriented dict to a CSV at the supplied location."""
-    park_names = []
+    hotspot_names = []
     for bird in sp_data.values():
-        for park in bird.keys():
-            if not park in park_names:
-                park_names.append(park)
-    park_names.insert(0, 'Species')
+        for hotspot in bird.keys():
+            if not hotspot in hotspot_names:
+                hotspot_names.append(hotspot)
+    hotspot_names.insert(0, 'Species')
 
     with open(file_location, 'w', newline='') as out_file:
-        writer = csv.writer(out_file, park_names)
-        writer.writerow(park_names)
+        writer = csv.writer(out_file, hotspot_names)
+        writer.writerow(hotspot_names)
         for bird_dict in sp_data:
             p_vals = list(sp_data[bird_dict].values())
             p_vals.insert(0, bird_dict)
@@ -177,19 +177,19 @@ def write_csv_file(file_location, sp_data):
 def write_json_file(file_location, sp_data):
     '''Records supplied species oriented dict to a JSON file at the supplied location'''
     data_dict = {}
-    park_names = []
+    hotspot_names = []
     for bird in sp_data.values():
-        for park in bird.keys():
-            if not park in park_names:
-                park_names.append(park)
+        for hotspot in bird.keys():
+            if not hotspot in hotspot_names:
+                hotspot_names.append(hotspot)
         break    
-    park_names = sorted(park_names)
+    hotspot_names = sorted(hotspot_names)
     
     bird_dict = {}
     for bird in sp_data:
         bird_dict[bird] = sp_data[bird]
     
-    data_dict['Park Names'] = park_names
+    data_dict['Hotspot Names'] = hotspot_names
     data_dict['Birds'] = bird_dict
 
     with open(file_location, 'w') as out_file:
@@ -226,10 +226,10 @@ def main():
     for file in file_name_list:
         file_list.append(DATA_FOLDER / file)
 
-    master_park_dict = summarize_barchart_files(file_list, month)
-    species_list = generate_species_list(master_park_dict.values())
+    master_hotspot_dict = summarize_barchart_files(file_list, month)
+    species_list = generate_species_list(master_hotspot_dict.values())
 
-    master_species_dict = species_dict_from_park_dict(species_list, master_park_dict)
+    master_species_dict = species_dict_from_hotspot_dict(species_list, master_hotspot_dict)
 
     sorted_master_dict = sort_species_dict(master_species_dict)
 
@@ -253,7 +253,7 @@ def test():
 
     m_dict = summarize_barchart_files(file_list, 'jan')
     sp_list = generate_species_list(m_dict.values())    
-    master_sp_dict = species_dict_from_park_dict(sp_list, m_dict)
+    master_sp_dict = species_dict_from_hotspot_dict(sp_list, m_dict)
     
     write_csv_file(TEST_OUT_FILE, master_sp_dict)
 
