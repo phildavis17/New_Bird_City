@@ -1,5 +1,7 @@
-{% extends base.html %}
+{% extends "base.html" %}
 
 {% block content %}
-
+    {% for hotspot in trip.hotspots %}
+        <div><p>{{ hotspot }}</p></div>
+    {% endfor %}
 {% endblock %}

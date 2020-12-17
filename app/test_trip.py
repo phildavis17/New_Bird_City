@@ -23,7 +23,7 @@ json_chunk_b = '''{
     }'''
 
 @pytest.fixture
-def _fixture():
+def trip_fixture():
     '''Test Trip creation with fixed data.'''
     test_data = trip.build_master_dict(json_chunk_a)
     return trip.Trip(test_data, test_data['Hotspot Names'])

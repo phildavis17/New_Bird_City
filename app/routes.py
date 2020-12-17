@@ -1,16 +1,19 @@
+from app.trip import MASTER_TRIP
 from flask import render_template
 from app import app
-from app.route import Route
+from app.trip import Trip
+
+#import app.trip
 
 @app.route('/')
 @app.route('/index')
 def index():
-    user = {'username': 'Miguel'}
-    return "Hello World!"
+    #user = {'username': 'Miguel'}
+    return "Hello World! I'm working on it, ok?"
 
 @app.route('/base/<title>')
 def base(title):
-    #title = "this is a test"
+    #title = "this is a test"/
     return render_template('base.html', title=title)
 
 #newbirdcity/analysis/001101110/prospect park (birds that are specialties of this park, while on this route)
@@ -20,7 +23,8 @@ def base(title):
 @app.route('/analysis')
 def analysis():
     title = "Hotspot Analysis"
-    return render_template('analysis.html', title=title)
+    #trip = MASTER_TRIP
+    return render_template('analysis.html', title=title, trip=MASTER_TRIP)
 
 
 @app.route('/analysis/species/<sp_name>')
