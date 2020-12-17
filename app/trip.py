@@ -7,8 +7,8 @@ import json
 import random
 
 
-MASTER_JSON = R'D:\Douments\Code\New_Bird_City\BK_May_3.json'  # Desktop Version
-# MASTER_JSON = R'C:\Documents\Code\New_Bird_City\BK_May_3.json'  # Laptop Version
+# MASTER_JSON = R'D:\Douments\Code\New_Bird_City\BK_May_3.json'  # Desktop Version
+MASTER_JSON = R'C:\Documents\Code\New_Bird_City\BK_May_3.json'  # Laptop Version
 
 
 def parse_json(file_location):
@@ -129,7 +129,7 @@ class Trip:
 
 
 with open(MASTER_JSON, 'r') as in_file:
-        MASTER_ROUTE = build_master_dict(in_file.read())
+        MASTER_TRIP = build_master_dict(in_file.read())
 
 
 def test():
