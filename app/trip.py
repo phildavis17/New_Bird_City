@@ -7,8 +7,8 @@ import json
 import random
 
 
-# MASTER_JSON = R'D:\Douments\Code\New_Bird_City\BK_May_3.json'  # Desktop Version
-MASTER_JSON = R'C:\Documents\Code\New_Bird_City\BK_May_3.json'  # Laptop Version
+MASTER_JSON = R'D:\Douments\Code\New_Bird_City\BK_May_3.json'  # Desktop Version
+# MASTER_JSON = R'C:\Documents\Code\New_Bird_City\BK_May_3.json'  # Laptop Version
 
 
 def parse_json(file_location):
@@ -45,6 +45,8 @@ def trip_from_index(master_dict, index):
             trip_hotspots.append(master_dict['Hotspot Names'][i])
     return Trip(master_dict, trip_hotspots)
 
+def build_master_trip(master_dict):
+    return Trip(master_dict, master_dict['Hotspot Names'])
 
 class Trip:
     '''A class to handle trips between hotspots.'''
