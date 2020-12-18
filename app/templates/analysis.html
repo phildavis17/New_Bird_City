@@ -1,7 +1,26 @@
 {% extends "base.html" %}
 
 {% block content %}
-    {% for hotspot in trip.hotspots %}
-        <div><p>{{ hotspot }}</p></div>
-    {% endfor %}
+    <table>
+        <caption>Hotspot Summary</caption>
+        <thead>
+            <tr>
+                <th>Species</th>
+                {% for hotspot in hotspots %}
+                    <th>{{ hotspot }}</th>
+                {% endfor %}
+            </tr>
+        </thead>
+        <tbody>
+            {% for species in birds %}
+                <tr>
+                    <td>{{ species }}</td>
+                    {% for hotspot in hotspots %}
+                        <td>{{ birds[species][hotspot] }}</td>
+                    {% endfor %}
+                </tr>            
+            {% endfor %}
+        </tbody>
+    </table>
+    
 {% endblock %}

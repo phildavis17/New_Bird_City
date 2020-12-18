@@ -1,6 +1,7 @@
 from app.trip import MASTER_TRIP
 from flask import render_template
 from app import app
+from app import trip
 from app.trip import Trip
 
 #import app.trip
@@ -23,8 +24,10 @@ def base(title):
 @app.route('/analysis')
 def analysis():
     title = "Hotspot Analysis"
-    #trip = MASTER_TRIP
-    return render_template('analysis.html', title=title, trip=MASTER_TRIP)
+    #dummy_trip = trip.build_master_trip(MASTER_TRIP)
+    hotspots = MASTER_TRIP["Hotspot Names"]
+    species = MASTER_TRIP["Birds"]
+    return render_template('analysis.html', title=title, hotspots=hotspots, birds=species)
 
 
 @app.route('/analysis/species/<sp_name>')
