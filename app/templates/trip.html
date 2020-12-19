@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <p>Parks:</p>
+    <ul>
+        {% for hotspot in this_trip.hotspots %}
+            <li>{{ hotspot }}</li>
+        {% endfor %}    
+    </ul>
+    <p></p>
+    <table>
+        <caption>Birds On This Trip</caption>
+        <thead>
+            <tr>
+                <th>Species</th>
+                <th>Probablility</th>
+            </tr>
+        </thead>
+        {% for bird in this_trip.birds %}
+            <tr>
+                <td>{{ bird }}</td>
+                <td>{{ this_trip.birds[bird] }}</td>
+            </tr>
+        {% endfor %}
+    </table>
+{% endblock %}
