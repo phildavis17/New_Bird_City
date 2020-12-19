@@ -7,8 +7,8 @@ import json
 import random
 
 
-MASTER_JSON = R'D:\Douments\Code\New_Bird_City\BK_May_3.json'  # Desktop Version
-# MASTER_JSON = R'C:\Documents\Code\New_Bird_City\BK_May_3.json'  # Laptop Version
+# MASTER_JSON = R'D:\Douments\Code\New_Bird_City\BK_May_3.json'  # Desktop Version
+MASTER_JSON = R'C:\Documents\Code\New_Bird_City\BK_May_3.json'  # Laptop Version
 
 
 def parse_json(file_location):

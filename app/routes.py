@@ -1,4 +1,4 @@
-from app.trip import MASTER_TRIP
+from app.trip import MASTER_TRIP, trip_from_index
 from flask import render_template
 from app import app
 from app import trip
@@ -10,7 +10,7 @@ from app.trip import Trip
 @app.route('/index')
 def index():
     #user = {'username': 'Miguel'}
-    return "Hello World! I'm working on it, ok?"
+    return render_template('index.html')
 
 @app.route('/base/<title>')
 def base(title):
@@ -40,9 +40,10 @@ def analysis_hotspot(hs_name):
     pass
 
 
-@app.route('/analysis/<rt_index>')
-def hs_route(rt_index):
-    pass
+@app.route('/analysis/<trip_index>')
+def hs_trip(trip_index):
+    new_trip = trip_from_index(MASTER_TRIP, trip_index)
+    return render_template('trip.html', this_trip=new_trip)
 
 
 # Would I then do something like /analysis/<rt_index>/hotspots/<hotspot>
