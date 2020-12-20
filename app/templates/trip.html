@@ -1,26 +1,33 @@
 {% extends "base.html" %}
 
+{% block nav %}
+    <a href="/analysis">Back to Analysis</a>
+{% endblock %}
+
 {% block content %}
     <p>Parks:</p>
-    <ul>
-        {% for hotspot in this_trip.hotspots %}
-            <li>{{ hotspot }}</li>
-        {% endfor %}    
-    </ul>
-    <p></p>
-    <table>
-        <caption>Birds On This Trip</caption>
-        <thead>
-            <tr>
-                <th>Species</th>
-                <th>Probablility</th>
-            </tr>
-        </thead>
-        {% for bird in this_trip.birds %}
-            <tr>
-                <td>{{ bird }}</td>
-                <td>{{ this_trip.birds[bird] }}</td>
-            </tr>
-        {% endfor %}
-    </table>
+    <div>
+        <ul>
+            {% for hotspot in this_trip.hotspots %}
+                <li>{{ hotspot }}</li>
+            {% endfor %}    
+        </ul>
+    </div>
+    <div>
+        <table>
+            <caption>Birds On This Trip</caption>
+            <thead>
+                <tr>
+                    <th>Species</th>
+                    <th>Probablility</th>
+                </tr>
+            </thead>
+            {% for bird in this_trip.birds %}
+                <tr>
+                    <td>{{ bird }}</td>
+                    <td>{{ this_trip.birds[bird] }}</td>
+                </tr>
+            {% endfor %}
+        </table>
+    </div>
 {% endblock %}

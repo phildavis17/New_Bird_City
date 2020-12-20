@@ -10,7 +10,10 @@
     {% endif %}
 </head>
 <body>
-    <div>New Bird City: <a href="/index.">Home</a></div>
+    <div>
+        New Bird City: <a href="/index.">Home</a>
+        {% block nav %} {% endblock %}
+    </div>
     <hr>
     {% block content %}{% endblock %}
 </body>
