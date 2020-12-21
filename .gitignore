@@ -3,3 +3,4 @@ scratch.py
 /.vscode
 /__pycache__
 /app/__pycache__
+/archive
