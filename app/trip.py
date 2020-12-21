@@ -1,5 +1,6 @@
 from collections import defaultdict
 from decimal import *
+from pathlib import Path
 
 import csv
 import hashlib
@@ -7,7 +8,8 @@ import json
 import random
 
 
-MASTER_JSON = R'D:\Douments\Code\New_Bird_City\BK_May_3.json'  # Desktop Version
+MASTER_JSON = Path(__file__).parent.parent/'BK_May_3.json'
+# MASTER_JSON = R'D:\Douments\Code\New_Bird_City\BK_May_3.json'  # Desktop Version
 # MASTER_JSON = R'C:\Documents\Code\New_Bird_City\BK_May_3.json'  # Laptop Version
 
 
