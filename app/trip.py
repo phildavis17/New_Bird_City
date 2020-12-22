@@ -132,6 +132,20 @@ class Trip:
     def compare_verbose(self, alt_trip):
         pass
 
+    def sort_val(self):
+        '''Returns the trip dict sorted by liklihood value.'''
+        sorted_dict = {}
+        for k, v in sorted(self.birds.items(), key=lambda pair: pair[1], reverse=True):
+            sorted_dict[k] = v
+        return sorted_dict
+
+    def sort_alpha(self):
+        '''Returns the trip dict sorted by species name.'''
+        sorted_dict = {}
+        for k in sorted(self.birds):
+            sorted_dict[k] = self.birds[k]
+        return sorted_dict
+
 
 with open(MASTER_JSON, 'r') as in_file:
         MASTER_TRIP = build_master_dict(in_file.read())
@@ -140,10 +154,9 @@ with open(MASTER_JSON, 'r') as in_file:
 def test():
     master_data = parse_json(MASTER_JSON)
     #print(master_data)
-    test_trip = random_trip(master_data, 3)
-    print(test_trip.hotspots)
-    print(test_trip.score)
-    print(test_trip.total_species)
+    test_trip = random_trip(master_data, 2)
+    print(test_trip.sort_alpha())
+    print(test_trip.birds)
     
 
 if __name__ == "__main__":
