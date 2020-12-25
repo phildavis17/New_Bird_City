@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+{% block nav %}
+    <a href="./">Back to Trip Overview</a>
+{% endblock %}
+
+{% block content %}
+    <div>
+        <table>
+            <caption>Specialties, baby</caption>
+            <thead>
+                <tr>
+                    <th>Species</th>
+                    {% for hotspot in this_trip.hotspots %}
+                        <th>{{ hotspot }}</th>
+                    {% endfor %}
+                </tr>
+            </thead>
+            {% for bird in this_trip.specialties %}
+                <tr>
+                    <td>{{ bird }}</td>
+                    {% for hotspot in this_trip.hotspots %}
+                        {% if hotspot in this_trip.specialties[bird] %}
+                            <td>{{ this_trip.specialties[bird][hotspot] }}</td>
+                        {% else %}
+                            <td></td>
+                        {% endif %}
+                    {% endfor %}
+                </tr>
+            {% endfor %}
+        </table>
+    </div>
+{% endblock %}

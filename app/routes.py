@@ -45,6 +45,10 @@ def hs_trip(trip_index):
     new_trip = trip_from_index(MASTER_TRIP, trip_index)
     return render_template('trip.html', this_trip=new_trip)
 
+@app.route('/analysis/<trip_index>/specialties')
+def specialties(trip_index):
+    new_trip = trip_from_index(MASTER_TRIP, trip_index)
+    return render_template('specialties.html', this_trip=new_trip)
 
 # Would I then do something like /analysis/<rt_index>/hotspots/<hotspot>
 # and then                       /analysis/<rt_index>/species/<species>
