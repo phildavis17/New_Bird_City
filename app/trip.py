@@ -47,9 +47,11 @@ def trip_from_index(master_dict, index):
             trip_hotspots.append(master_dict['Hotspot Names'][i])
     return Trip(master_dict, trip_hotspots)
 
+
 def build_master_trip(master_dict):
     '''Creates a Trip object including all parks'''
     return Trip(master_dict, master_dict['Hotspot Names'])
+
 
 class Trip:
     '''A class to handle trips between hotspots.'''

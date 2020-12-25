@@ -2,11 +2,12 @@
 
 {% block nav %}
     <a href="/analysis">Back to Analysis</a>
+    <a href="/specialties">See Specialties</a>
 {% endblock %}
 
 {% block content %}
-    <p>Parks:</p>
     <div>
+        <p>Parks:</p>    
         <ul>
             {% for hotspot in this_trip.hotspots %}
                 <li>{{ hotspot }}</li>
