@@ -1,8 +1,11 @@
 from app.trip import MASTER_TRIP, trip_from_index
-from flask import render_template
+from flask import render_template, redirect, flash
+#from flask_wtf import FlaskForm
+#from wtforms import BooleanField, SubmitField
 from app import app
 from app import trip
 from app.trip import Trip
+from app.forms import MyForm
 
 #import app.trip
 
@@ -45,10 +48,26 @@ def hs_trip(trip_index):
     new_trip = trip_from_index(MASTER_TRIP, trip_index)
     return render_template('trip.html', this_trip=new_trip)
 
+
 @app.route('/analysis/<trip_index>/specialties')
 def specialties(trip_index):
     new_trip = trip_from_index(MASTER_TRIP, trip_index)
     return render_template('specialties.html', this_trip=new_trip)
+
+
+@app.route('/analysis/<trip_index>/hotspot/<hotspot_name>')
+def trip_park(trip_index, park_name):
+    new_trip = trip_from_index(MASTER_TRIP, trip_index)
+    return render_template('trip_hotspot.html', master_dict=MASTER_TRIP, this_trip=new_trip, this_hotspot=hotspot_name)
+
+@app.route('/form_test', methods=['GET', 'POST'])
+def form_test():
+    form = MyForm()
+    if form.validate_on_submit():
+        flash('This is a test.')
+        return redirect('#')
+    return render_template('form.html', form=form)
+    
 
 # Would I then do something like /analysis/<rt_index>/hotspots/<hotspot>
 # and then                       /analysis/<rt_index>/species/<species>
