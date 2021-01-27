@@ -1,7 +1,9 @@
 {% extends "base.html" %}
 
 {% block content %}
-    <button>Generate Route</button>
+    <form method="GET" id="trip_creation_form"></form>
+
+    <button type="submit" form="trip_creation_form">Generate Route</button>
     <table>
         <caption>Hotspot Summary</caption>
         <thead>
@@ -13,13 +15,19 @@
             </tr>
         </thead>
         <tbody>
+            <tr>
+                <td>Include</td>
+                {% for hotspot in hotspots %}
+                    <td><input type="checkbox" name={{ hotspot }} id="" form="trip_creation_form"></td>
+                {% endfor %}
+            </tr>
             {% for species in birds %}
                 <tr>
                     <td>{{ species }}</td>
                     {% for hotspot in hotspots %}
                         <td>{{ birds[species][hotspot] }}</td>
                     {% endfor %}
-                </tr>            
+                </tr>
             {% endfor %}
         </tbody>
     </table>

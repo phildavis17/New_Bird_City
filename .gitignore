@@ -1,7 +1,7 @@
 scratch.py
 /env
 /.vscode
-__pycache__/
-/app/__pycache__/
 .pytest_cache/
 /archive
+__pycache__
+ignoretest.py

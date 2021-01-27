@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+
+{% block nav %}
+{% endblock %}
+
+{% block content %}
+    <div>
+        <table>
+            <caption>{{ this_hotspot }}</caption>
+            <thead>
+                <tr>
+                    <td>Species</td>
+                    <td>Local Odds</td>
+                    <td>Specialty</td>
+                </tr>
+            </thead>
+            {% for bird in this_trip.birds %}
+                <tr>
+                    <td>{{ bird }}</td>
+                    <td>{{ master_dict.birds[bird][this_hotspot] }}</td>
+                    {% if this_hotspot in this_trip.specialties[bird] %}
+                        <td>{{ this_trip.specialties[bird][this_hotspot] }}</td>
+                    {% else %}
+                        <td></td>
+                    {% endif %}
+                </tr>
+            {% endfor %}
+
+        </table>
+    </div>
+{% endblock %}
