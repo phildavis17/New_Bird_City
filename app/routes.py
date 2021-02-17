@@ -1,5 +1,5 @@
 from app.trip import MASTER_TRIP, trip_from_index
-from flask import render_template, redirect, flash
+from flask import render_template, redirect, flash, url_for, request
 #from flask_wtf import FlaskForm
 #from wtforms import BooleanField, SubmitField
 from app import app
@@ -60,12 +60,15 @@ def trip_park(trip_index, park_name):
     new_trip = trip_from_index(MASTER_TRIP, trip_index)
     return render_template('trip_hotspot.html', master_dict=MASTER_TRIP, this_trip=new_trip, this_hotspot=hotspot_name)
 
+@app.route('/map')
+def map_page():
+    return render_template('map.html')
+
 @app.route('/form_test', methods=['GET', 'POST'])
 def form_test():
     form = MyForm()
-    if form.validate_on_submit():
-        flash('This is a test.')
-        return redirect('#')
+    if request.method == 'POST' and form.validate_on_submit():
+        return redirect(url_for("base", title=request.form['name']))
     return render_template('form.html', form=form)
     
 
