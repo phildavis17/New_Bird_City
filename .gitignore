@@ -3,5 +3,5 @@ scratch.py
 /.vscode
 .pytest_cache/
 /archive
-__pycache__
+/__pycache__/
 ignoretest.py
