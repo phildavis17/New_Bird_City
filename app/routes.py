@@ -1,4 +1,4 @@
-from app.trip import MASTER_TRIP, trip_from_index
+from app.trip import MASTER_TRIP, trip_from_index, report
 from flask import render_template, redirect, flash, url_for, request
 #from flask_wtf import FlaskForm
 #from wtforms import BooleanField, SubmitField
@@ -29,7 +29,7 @@ def analysis():
     title = "Hotspot Analysis"
     #dummy_trip = trip.build_master_trip(MASTER_TRIP)
     hotspots = MASTER_TRIP["Hotspot Names"]
-    species = MASTER_TRIP["Birds"]
+    species = report(MASTER_TRIP["Birds"])
     return render_template('analysis.html', title=title, hotspots=hotspots, birds=species)
 
 
