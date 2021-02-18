@@ -1,0 +1,23 @@
+th {
+    text-align: center;
+}
+
+
+.noObs {
+    color: rgb(177, 177, 177);
+    text-align: center;
+}
+
+.birdObs {text-align: center;}
+
+.lowObs {text-align: center;}
+
+.highObs {text-align: center;}
+
+.spName {
+    font-weight: bold;
+}
+
+.table {
+    margin: 20px;
+}

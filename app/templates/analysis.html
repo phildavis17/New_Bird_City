@@ -1,11 +1,15 @@
 {% extends "base.html" %}
 
+{% block head %}
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='analysisstyle.css') }}">
+    <script src=""></script>
+{% endblock %}
+
 {% block content %}
     <form method="GET" id="trip_creation_form"></form>
 
     <button type="submit" form="trip_creation_form">Generate Route</button>
     <table class="table table-striped table-hover table-bordered table-sm">
-        <caption>Hotspot Summary</caption>
         <thead>
             <tr>
                 <th>Species</th>
@@ -15,17 +19,19 @@
             </tr>
         </thead>
         <tbody>
-            <tr>
-                <td>Include</td>
-                {% for hotspot in hotspots %}
-                    <td><input type="checkbox" name={{ hotspot }} id="" form="trip_creation_form"></td>
-                {% endfor %}
-            </tr>
             {% for species in birds %}
                 <tr>
-                    <td>{{ species }}</td>
+                    <td class="spName">{{ species }}</td>
                     {% for hotspot in hotspots %}
-                        <td>{{ birds[species][hotspot] }}</td>
+                        {% if birds[species][hotspot] == "-" %}
+                            <td class="noObs">{{ birds[species][hotspot] }}</td>
+                        {% elif birds[species][hotspot] == "<1%" %}
+                            <td class="lowObs">{{ birds[species][hotspot] }}</td>
+                        {% elif birds[species][hotspot] == ">99%" %}
+                            <td class="highObs">{{ birds[species][hotspot] }}</td>
+                        {% else %}
+                            <td class="birdObs">{{ birds[species][hotspot] }}</td>
+                        {% endif %}
                     {% endfor %}
                 </tr>
             {% endfor %}

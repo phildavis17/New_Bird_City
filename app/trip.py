@@ -53,6 +53,31 @@ def build_master_trip(master_dict):
     return Trip(master_dict, master_dict['Hotspot Names'])
 
 
+def report(in_dict):
+    ''' Returns a trip dict with the numbers replaced with text. Treats certain values with special rules'''
+    special_conditions = {
+        "Zero": "-",
+        "Low": "<1%",
+        "High": ">99%",
+    }
+
+    report_dict = {}
+    for bird in in_dict:
+        bird_dict = {}
+        for hotspot in in_dict[bird]:
+            obs = in_dict[bird][hotspot]
+            if obs == 0:
+                bird_dict[hotspot] = special_conditions["Zero"]
+            elif obs < 0.01:
+                bird_dict[hotspot] = special_conditions["Low"]
+            elif obs > 0.99:
+                bird_dict[hotspot] = special_conditions["High"]
+            else:
+                bird_dict[hotspot] = f"{round(obs * 100, 1)}%"
+        report_dict[bird] = bird_dict
+    return report_dict            
+
+
 class Trip:
     '''A class to handle trips between hotspots.'''
     
@@ -154,11 +179,7 @@ with open(MASTER_JSON, 'r') as in_file:
 
 
 def test():
-    master_data = parse_json(MASTER_JSON)
-    #print(master_data)
-    test_trip = random_trip(master_data, 2)
-    print(test_trip.sort_alpha())
-    print(test_trip.birds)
+    print(report(MASTER_TRIP["Birds"]))
     
 
 if __name__ == "__main__":

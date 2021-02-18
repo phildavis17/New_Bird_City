@@ -1,0 +1,10 @@
+Flow
+
+1. Map Page - Pick a spot on a map and a distance threshold
+    -The app fetches eBird hotspots within the threshold of the selected spot
+    -the app suggests the top 10 by species count
+
+2. Analysis Page - Explore the hotspots, and decide which ones you care about
+    -The app scrapes the barchart data for 
+
+3. Park Page - Exists within the context of a set trip. Tells you what to look out for at a certain park
