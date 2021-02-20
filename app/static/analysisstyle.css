@@ -2,9 +2,19 @@ th {
     text-align: center;
 }
 
+td {
+    align-self: center;
+}
+
+.active {
+}
+
+.includeCB {
+    align-self: center;
+}
 
 .noObs {
-    color: rgb(177, 177, 177);
+    color: rgb(200, 200, 200);
     text-align: center;
 }
 
@@ -13,6 +23,10 @@ th {
 .lowObs {text-align: center;}
 
 .highObs {text-align: center;}
+
+.inactive {
+    color: rgb(200, 200, 200);
+}
 
 .spName {
     font-weight: bold;

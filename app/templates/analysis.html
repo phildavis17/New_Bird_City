@@ -2,7 +2,7 @@
 
 {% block head %}
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='analysisstyle.css') }}">
-    <script src=""></script>
+    <script src="{{ url_for('static', filename='analysisscript.js') }}"></script>
 {% endblock %}
 
 {% block content %}
@@ -17,20 +17,26 @@
                     <th>{{ hotspot }}</th>
                 {% endfor %}
             </tr>
+            <tr id="includeRow">
+                <td></td>
+                {% for hotspot in hotspots %}
+                    <td><input form="trip_creation_form" type="checkbox" name="{{''.join(hotspot.split())}}" id="" class ="includeCB"  onclick="toggleActive()" checked></td>
+                {% endfor %}
+            </tr>
         </thead>
         <tbody>
             {% for species in birds %}
-                <tr>
+                <tr class="spRow {{ ''.join(species.split()) }}" }}>
                     <td class="spName">{{ species }}</td>
                     {% for hotspot in hotspots %}
                         {% if birds[species][hotspot] == "-" %}
-                            <td class="noObs">{{ birds[species][hotspot] }}</td>
+                            <td class="noObs active {{ ''.join(hotspot.split()) }}" >{{ birds[species][hotspot] }}</td>
                         {% elif birds[species][hotspot] == "<1%" %}
-                            <td class="lowObs">{{ birds[species][hotspot] }}</td>
+                            <td class="lowObs active {{ ''.join(hotspot.split()) }}">{{ birds[species][hotspot] }}</td>
                         {% elif birds[species][hotspot] == ">99%" %}
-                            <td class="highObs">{{ birds[species][hotspot] }}</td>
+                            <td class="highObs active {{ ''.join(hotspot.split()) }}">{{ birds[species][hotspot] }}</td>
                         {% else %}
-                            <td class="birdObs">{{ birds[species][hotspot] }}</td>
+                            <td class="birdObs active {{ ''.join(hotspot.split()) }}">{{ birds[species][hotspot] }}</td>
                         {% endif %}
                     {% endfor %}
                 </tr>
@@ -38,4 +44,5 @@
         </tbody>
     </table>
     
+
 {% endblock %}
