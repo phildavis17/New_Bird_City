@@ -68,7 +68,7 @@ def map_page():
 def form_test():
     form = MyForm()
     if request.method == 'POST' and form.validate_on_submit():
-        return redirect(url_for("base", title=request.form['name']))
+        return redirect(url_for("hs_trip", trip_index=request.form['name']))
     return render_template('form.html', form=form)
     
 
