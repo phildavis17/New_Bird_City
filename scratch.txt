@@ -1,10 +1,90 @@
 Flow
 
+0. Login - The user logs in, or creates an account
+
 1. Map Page - Pick a spot on a map and a distance threshold
     -The app fetches eBird hotspots within the threshold of the selected spot
     -the app suggests the top 10 by species count
+!!! -There's got to be a way to overule the app's suggestions
+    -The user selects the time period of their trip
+
+----At this point------
+    -an ANALYSIS object is instantiated
+    -The app scrapes the barchart data for the chosen hot spots
+    -the base barchart data is timestamped, and persists in a database
+    -the base barchart data is read, and processed structured data is created. These data products are also timestamped and persists
+    -if the needed data is both present and current, it's grabbed from the DB, and not scraped
+
 
 2. Analysis Page - Explore the hotspots, and decide which ones you care about
-    -The app scrapes the barchart data for 
+    -The user turns specific hotspots on and off, and sees how that affects the overall numbers
+    -The page calculates the overall odds for every bird, based on active hotspots
 
-3. Park Page - Exists within the context of a set trip. Tells you what to look out for at a certain park
+
+----At this point----
+    -a TRIP object is instantiated, and logged to a user's account, if they have one
+    -
+
+3?. Trip Page
+    -
+
+
+
+
+4. Park Page - Exists within the context of a set trip. Tells you what to look out for at a certain park
+
+
+
+
+OBJECT DESCRIPTIONS
+
+1. ANALYSIS
+    Has:
+        -A list of hotspots, which may be INLCUDED or EXCLUDED
+        -an associated date range
+
+    DOES NOT:
+        -Know which birds you've seen
+
+2. TRIP
+    Has:
+        -A list of hotspots, all of whic
+        -A list of birds, which may be INLCUDED(unseen) or EXCLUDED(seen)
+
+?? PARK ??
+
+
+?? BIRD ??
+
+
+
+USE CASES
+-Trip Planning
+
+-Event Planning
+
+-Help in the field
+
+
+
+
+
+THE MONK PARAKEET PROBLEM
+    Part 1 - General process Flow
+    -Find parks
+    -pick the parks you want to go to. This is your "trip"
+
+    Part 2 - Monk Parakeets   
+    -The idea of a park specialty
+    -specialties REQUIRE a specific context of other parks on the route
+    -Therefore, specialties are downstream of park selection. 
+    -BUT information about specialties can strongly suggest changing the other parks on the route
+        -IF alternate parks are kept alive this deep into the process
+            -the amount of info blasting the user could be too much
+            -The a TRIP is now just a state of an ANALYSIS, which means:
+            -There is less data that the app needs to persist.
+            -There is more data that needs to be calculated on the fly every time,
+        -IF they are not, the process of trimming a park from the trip is clunky and inconvenient
+            -A TRIP object is distinct from an ANALYSIS object, and could be smaller in a data sense
+            -A TRIP object makes sense as something to persist. Very few calculations would be needed after that point
+
