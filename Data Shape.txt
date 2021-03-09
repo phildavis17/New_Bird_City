@@ -16,9 +16,116 @@ eBird Barchart DATA
 
 
 
-----------------Entities----------------
-users
-hotspots
-trips
+---------Entities and Relationships----------------
+Users have
+    -One username
+    -One password
+    -one email address
+    -many Analysises
+Analysises have
+    -one name
+    -one configuration
+    -Many hotspot period summaries
+Analysis Configurations have
+    -One Analysis
+    -many parks
+    -many birds
+Hotspots have
+    -One locId
+    -one name
+    -one timestamp
+    -one eBird bar chart data file
+    -many period summaries
+Period Summaries have
+    -one hotspot
+    -one period
+    -one timestamp
+    -many species observations
 birds
-observations
+    -one taxonomic index <-------PK
+    -one species code
+    -one name
+    -one scientific name
+    
+
+
+----------In Order To---------------
+Get a bird occurance number
+    -hotspot
+    -period
+    -species
+
+
+
+------------TABLES----------------
+Species
+-TaxIndex, int (PK)
+    The eBird taxonomic index of this species
+-Code, string 10
+    The eBird species code
+-CommonName, string 100
+    The common name, as defined by eBird
+-SciName, string 100
+    The scientific name, as defined by eBird
+
+
+Hotspots
+-LocId (PK)
+    The eBird LocId of this hotspot
+-Name
+    The full name of the hotspot
+-Timestamp
+    The last time this hotspot's data was scraped
+
+
+Observations
+-LocId, string 20 (FK)
+    The LocId of the hotspot for this observation 
+-Period, int (partial PK)
+    The period associated with this observation
+-TaxIndex, int (FK)
+    The taxonomic index of the species for this observation
+-Observations, float
+    The occurance rate for this species, at this hotspot, in this period
+
+
+SeenBirds
+-UserId, int (FK)
+    The user in question
+-AnalysisId, int (Partial PK)
+    The analysis ID within which this bird is seen
+-TaxIndex, int (FK)
+    A bird that user has marked as seen
+
+
+Analyses
+-UserId (FK)
+-AnalysisId, int (partial PK)
+-AnalysisName, string 100
+-period, int (FK)
+
+
+AnalysisHotspotConfigs
+-UserId, int (FK)
+    the user who's analysis this belongs to
+-AnalysisId, int (FK)
+    an ID number per user of the analysis in question
+-LocId (FK)
+    the locId of a hotspot included in this analysis
+-IsActive, bool (int?)
+    a one or a zero, depending on whether the hotspot is active
+
+
+Periods
+-PeriodId, int (PK)
+    a number 1 to 48
+-Description, string 30
+    A human readible description of the associated period
+
+
+Users
+-UserId (PK)
+-Password, some kind of hash
+-Email
+-LoginCount
+
