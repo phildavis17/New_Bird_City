@@ -3,17 +3,19 @@ import csv
 import json
 import math
 
+from pathlib import Path
+
 def get_period_columns(n: int) -> list:
     cols = []
     offset = 2
-    for i in range(n - 2, n + 2):
+    for i in range(n - 2, n + 2):  #! this is a crazy way to set up this range. should be range(4) and offset gets you to the first good column.
         cols.append((i + offset) % (48 + offset))
     return cols
 
 
 def humanize_date_range(n:int) -> str:
     """
-    Returns a human readible description of the time period associated with the supplied int. Styled as follows.
+    Returns a human readible description of the time period associated with the supplied int. Styled as follows:
     ...
     Late April
     Late April/Early May
@@ -41,10 +43,19 @@ def humanize_date_range(n:int) -> str:
     return f"{qual_strs[qual]} {month_str}"
 
 
+def is_good_species(species):
+    """Tests a supplied species name for substrings that indicate it is a sub-species level taxon."""
+    flag_strings = [' sp.', ' x ', '/', 'Domestic']
+    for flag in flag_strings:
+        if flag.lower() in species.lower():
+            return False
+    return True
 
-for i in range(48):
-    print(humanize_date_range(i))
+
+
+
+TEST_FILE = Path(R"C:\Users\Phil\Desktop\Buffer\ebird_L2741553__1900_2021_1_12_barchart.txt")
+
+with open(TEST_FILE, 'r') as in_file:
+    hotspot_file = csv.reader(in_file, dialect='excel-tab')
     
-        
-
-
