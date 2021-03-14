@@ -57,7 +57,7 @@ Get a bird occurance number
 
 
 
-------------TABLES----------------
+---------------------------------TABLES----------------------------------------------
 Species
 -TaxIndex, int (PK)
     The eBird taxonomic index of this species
@@ -79,7 +79,7 @@ Hotspots
 
 
 Observations
--LocId, string 20 (FK)
+-LocId, string 16 (FK)
     The LocId of the hotspot for this observation 
 -Period, int (partial PK)
     The period associated with this observation
@@ -119,7 +119,7 @@ AnalysisHotspotConfigs
 Periods
 -PeriodId, int (PK)
     a number 1 to 48
--Description, string 30
+-Description, string 32
     A human readible description of the associated period
 
 
