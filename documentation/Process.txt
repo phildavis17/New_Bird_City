@@ -1,0 +1,22 @@
+ - User picks a spot on the map, and a distance to search
+ - app uses eBird api to get hotspots within distance
+ - app selects 10 hotspots with highest species counts
+ - user selects which of those to consider
+ - for each considered hotspot
+    - is it in the database?
+    - is it current?
+    - if so, add it to the list to make an Analysis
+    - if not, scrape it, and add it to the database, and repeat previous steps
+ - 
+
+
+
+-----THINGS I PLAN TO USE----------
+
+Flask
+Flask-sqlalchemy (SQLAlchemy, SQL)
+Flask-migrate (Alembic)
+Flask-Login
+Flask-WTF (WTForms)
+Requests
+Leaflet
