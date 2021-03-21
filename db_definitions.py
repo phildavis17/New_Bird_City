@@ -1,11 +1,4 @@
-'''A tool for ingesting an eBird taxonomy csv file.'''
 
-import csv
-import os
-import sqlite3
-import sys
-
-from pathlib import Path
 from sqlalchemy import Column, ForeignKey, Integer, String, engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship, sessionmaker
@@ -16,6 +9,7 @@ from sqlalchemy.sql.sqltypes import Boolean, Float, TIMESTAMP
 engine = create_engine('sqlite:///data/test.db')
 
 Base = declarative_base()
+
 
 class Species(Base):
     __tablename__ = "Species"
@@ -78,37 +72,3 @@ class SeenBird(Base):
 
 Base.metadata.create_all(engine)
 Base.metadata.bind = engine
-
-DBSession = sessionmaker(bind=engine)
-session = DBSession()
-
-TAXONOMY_PATH = Path(__file__).parent/"data"/"eBird_Taxonomy_v2019.csv"
-
-CATEGORY_COL = 1  # This is the column that determines whether this is a Species or not.
-
-COL_LOOKUP = {
-    "SpCode": 2,
-    "CommonName": 3,
-    "SciName": 4,
-}
-"""
-
-with open(TAXONOMY_PATH, 'r') as tax_file:
-    reader = csv.reader(tax_file)
-    for line in reader:
-        tax_dict = {}
-        if line[CATEGORY_COL] == "species":
-            new_species = Species()
-            new_species.SpIndex = int(line[0])
-            new_species.SpCode = line[2]
-            new_species.CommonName = line[3]
-            new_species.SciName = line[4]
-            session.add(new_species)
-
-session.commit()
-
-sp = session.query(Species).first()
-print(sp.CommonName)
-
-
-"""
