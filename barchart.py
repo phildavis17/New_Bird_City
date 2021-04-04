@@ -7,17 +7,6 @@ from datetime import date
 from pathlib import Path
 
 
-def read_barchart_file(barchart_file) -> str:
-    with open(barchart_file, "r") as in_file:
-        pass
-
-
-def test():
-    TEST_FILE = Path(
-        R"C:\Users\Phil\Desktop\Buffer\ebird_L2741553__1900_2021_1_12_barchart.txt"
-    )
-
-
 class Barchart:
     BC_FILE_COL_OFFSET = (
         -2
@@ -28,26 +17,31 @@ class Barchart:
     def __init__(self) -> None:
         self.timestamp = date.today().strftime("%y%m%d")
 
-    @classmethod
-    def from_csv(cls, csv_path):
+    @staticmethod
+    def new_from_csv(csv_path):
         """Returns a new Barchart object containing the data from the specified .csv file."""
-        row_list = cls.read_csv_file(csv_path)
-        samps = row_list[cls.BC_FILE_SAMP_SIZE_ROW][1:]
-        obs = {}
-        for row in cls.filter_observation_rows(row_list[cls.BC_FILE_OBS_START_ROW :]):
-            sp_name = row[0]
-            obs[sp_name] = row[1:]
         new_barchart = Barchart()
-        new_barchart.observations = obs
-        new_barchart.samp_sizes = samps
-        new_barchart.loc_id = cls.loc_id_from_filename(csv_path)
+        new_barchart.ingest_csv(csv_path)
+        return new_barchart
+
+    def ingest_csv(self, csv_path: Path) -> None:
+        """Populates Barchart data from a provided eBird barchart file."""
+        row_list = self.read_csv_file(csv_path)
+        samps = [int(float(x)) for x in row_list[self.BC_FILE_SAMP_SIZE_ROW][1:] if x]
+        obs = {}
+        for row in self.filter_observation_rows(row_list[self.BC_FILE_OBS_START_ROW :]):
+            sp_name = self.clean_sp_name(row[0])
+            obs[sp_name] = [float(x) for x in row[1:] if x]
+        self.loc_id = self.loc_id_from_filename(csv_path)
+        self.samp_sizes = samps
+        self.observations = obs
 
     @staticmethod
     def read_csv_file(csv_path) -> list:
         """Returns a the lines of an eBird Barchart File as a list. Does no filtering."""
         with open(csv_path, "r") as in_file:
             row_list = []
-            reader = csv.reader()
+            reader = csv.reader(in_file, dialect="excel-tab")
             for row in reader:
                 row_list.append(row)
         return row_list
@@ -111,7 +105,7 @@ class Barchart:
     @staticmethod
     def is_good_species(species: str) -> bool:
         """Tests a supplied species name for substrings that indicate it is a sub-species level taxon."""
-        flag_strings = (" sp.", " x ", "/", "Domestic")
+        flag_strings = (" sp.", " x ", "/", "Domestic", "hybrid")
         for flag in flag_strings:
             if flag.lower() in species.lower():
                 return False
@@ -122,28 +116,70 @@ class Barchart:
         """Removes scientific name from species name cell if present."""
         # At time of writing, scientific names are all preceded by a space and an open peren.
         # If eBird changes this, this method will break.
-        end_index = sp_name.find(" (")
+        end_index = sp_name.find(" (<")
         if end_index == -1:
             return sp_name
         return sp_name[:end_index]
 
-    def summarize_period(self, period: int):
-        pass
+    @staticmethod
+    def combined_average(samp_sizes: list, obs: list) -> float:
+        """Takes two lists of numbers and returns the combined average as a float.
+
+        Args:
+            samp_size: A list  of sample sizes as floats.
+            presence: A list of occurance data as floats.
+
+        Returns:
+            The combined average as a float
+
+        Raises:
+            IndexError: The function will give unexpected results if the lists are
+            of different lengths, so it raises an IndexError rather than failing silently.
+        """
+        if not len(samp_sizes) == len(obs):
+            raise IndexError("Lists must have the same length.")
+        total_num_present = 0
+        data = zip(samp_sizes, obs)
+        for pair in data:
+            total_num_present += round(pair[0] * pair[1])
+        return round(total_num_present / sum(samp_sizes), 5)
+
+    def generate_period_summary(self, period: int):
+        summ = Summary()
+        summ.loc_id = self.loc_id
+        summ.period = period
+        summ.timestamp = self.timestamp
 
     def __repr__(self) -> str:
-        pass
+        return f"<Barchart object at {hex(id(self))}>"
 
     def __str__(self) -> str:
         pass
 
 
-if __name__ == "__main__":
-    # for i in range(48):
-    #    print(Barchart.humanize_date_range(i))
+class Summary:
+    def __init__(self) -> None:
+        self.loc_id = ""
+        self.period = -1
+        self.timestamp = ""
+        self.observations = {}
 
-    print(Barchart.humanize_date_range(0))
-    print(Barchart.get_period_columns(0))
-    print(Barchart.humanize_date_range(2))
-    print(Barchart.get_period_columns(2))
-    print(Barchart.humanize_date_range(47))
-    print(Barchart.get_period_columns(47))
+    def __repr__(self) -> str:
+        return f"<Summary object at {hex(id(self))}>"
+
+    def __len__(self) -> int:
+        return len(self.observations)
+
+    def get_species(self) -> list:
+        return self.observations.keys()
+
+
+if __name__ == "__main__":
+    TEST_FILE = Path(
+        R"C:\Users\Phil\Desktop\Buffer\ebird_L2741553__1900_2021_1_12_barchart.txt"
+    )
+
+    bc = Barchart.new_from_csv(TEST_FILE)
+    print(bc.timestamp)
+    print(bc.loc_id)
+    print(bc.samp_sizes)
