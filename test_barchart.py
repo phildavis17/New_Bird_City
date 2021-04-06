@@ -15,14 +15,11 @@ TEST_FILE_2 = Path(
 
 
 def test_get_column_bounds():
-    # generate a random number 0 - 47
-    # len == 4
-    # somehow that they are consecutive
     assert len(Barchart.get_period_columns(random.randint(0, 47))) == 4
-    assert min(Barchart.get_period_columns(1)) >= 1
-    assert max(Barchart.get_period_columns(1)) <= 48
-    assert Barchart.get_period_columns(2) == [1, 2, 3, 4]
-    assert Barchart.get_period_columns(0) == [47, 48, 1, 2]
+    assert min(Barchart.get_period_columns(1)) >= 0
+    assert max(Barchart.get_period_columns(1)) <= 47
+    assert Barchart.get_period_columns(2) == [0, 1, 2, 3]
+    assert Barchart.get_period_columns(0) == [46, 47, 0, 1]
 
 
 def test_humanize_period():
@@ -96,9 +93,13 @@ def test_combined_average():
     assert Barchart.combined_average(samps, obs_c) == round(0.363636367, 5)
 
 
-@pytest.mark.skip(reason="Not implimented yet.")
 def test_new_from_csv():
-    pass
+    bc = Barchart.new_from_csv(TEST_FILE)
+    assert bc is not None
+    assert bc.loc_id == "L2741553"
+    assert len(bc.observations) < 120
+    assert bc.get_observation("Canada Goose", 0) == 0
+    assert bc.get_observation("Double-crested Cormorant", 3) == 0.5
 
 
 @pytest.mark.skip(reason="Not implimented yet.")
@@ -107,13 +108,16 @@ def test_from_json():
 
 
 @pytest.mark.skip(reason="Not implimented yet.")
-def test_to_json():
+def test_new_to_json():
     pass
 
 
-@pytest.mark.skip(reason="Not implimented yet.")
 def test_summarize_period():
-    pass
+    bc = Barchart.new_from_csv(TEST_FILE)
+    sum = bc.new_period_summary(2)
+    assert sum.observations["Canada Goose"] == 0.6
+    for obs in sum.observations.values():
+        assert obs > 0
 
 
 if __name__ == "__main__":
