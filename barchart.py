@@ -4,6 +4,7 @@ import json
 import math
 
 from datetime import date
+from os import stat
 from pathlib import Path
 
 
@@ -37,7 +38,7 @@ class Barchart:
         self.observations = obs
 
     @staticmethod
-    def read_csv_file(csv_path) -> list:
+    def read_csv_file(csv_path: Path) -> list:
         """Returns a the lines of an eBird Barchart File as a list. Does no filtering."""
         with open(csv_path, "r") as in_file:
             row_list = []
@@ -61,14 +62,35 @@ class Barchart:
         return csv_path.stem.split("_")[1]
 
     @classmethod
-    def from_json(cls, json_path):
+    def new_from_json(cls, json_path: Path):
+        # TODO: Core
+        pass
+
+    def ingest_json(self, json_path: Path):
+        # TODO: Core
+        pass
+
+    @staticmethod
+    def read_json_file(json_path: Path):
+        # TODO: Core
+        pass
+
+    def to_json_string(self) -> str:
+        """Creates a json compatable string representation of this Barchart object."""
+        # TODO: Core
+        pass
+
+    @staticmethod
+    def stash_json(out_path: Path) -> None:
+        # TODO: Core
+        # This should check to make sure there is not an existing version of this hotspot in the folder
         pass
 
     @classmethod
     def get_period_columns(cls, n: int) -> list:
         cols = []
         for i in range(4):
-            c = ((n + i + cls.BC_FILE_COL_OFFSET) % 48) + 1
+            c = (n + i + cls.BC_FILE_COL_OFFSET) % 48
             cols.append(c)
         return cols
 
@@ -144,11 +166,49 @@ class Barchart:
             total_num_present += round(pair[0] * pair[1])
         return round(total_num_present / sum(samp_sizes), 5)
 
-    def generate_period_summary(self, period: int):
+    def get_observation(self, sp_name: str, index: int) -> float:
+        return self.observations[sp_name][index]
+
+    def _collect_period_samp_sizes(self, period: int) -> list:
+        """Returns the sample sizes for the supplied period"""
+        indecies = self.get_period_columns(period)
+        samps = []
+        for i in indecies:
+            samps.append(self.samp_sizes[i])
+        return samps
+
+    def _collect_period_observations(self, period: int) -> dict:
+        indecies = self.get_period_columns(period)
+        obs_dict = {}
+        for sp in self.observations:
+            sp_obs = []
+            for i in indecies:
+                sp_obs.append(self.get_observation(sp, i))
+            obs_dict[sp] = sp_obs
+        return obs_dict
+
+    def summarize_period(self, period: int) -> dict:
+        samps = self._collect_period_samp_sizes(period)
+        obs_dict = self._collect_period_observations(period)
+        summary_dict = {}
+        for sp, obs in obs_dict.items():
+            s = round(self.combined_average(samps, obs), 5)
+            if s > 0:
+                summary_dict[sp] = s
+        return summary_dict
+
+    def new_period_summary(self, period: int):
+        # TODO: Core
         summ = Summary()
         summ.loc_id = self.loc_id
         summ.period = period
         summ.timestamp = self.timestamp
+        summ.observations = self.summarize_period(period)
+        return summ
+
+    def summarize_all_periods_to_folder(self, out_folder: Path) -> None:
+        # TODO: Core
+        pass
 
     def __repr__(self) -> str:
         return f"<Barchart object at {hex(id(self))}>"
@@ -173,6 +233,10 @@ class Summary:
     def get_species(self) -> list:
         return self.observations.keys()
 
+    def to_json_string(self) -> str:
+        """Returns a json compatable string representation of this Summary."""
+        pass
+
 
 if __name__ == "__main__":
     TEST_FILE = Path(
@@ -180,6 +244,11 @@ if __name__ == "__main__":
     )
 
     bc = Barchart.new_from_csv(TEST_FILE)
-    print(bc.timestamp)
-    print(bc.loc_id)
-    print(bc.samp_sizes)
+    tp = 2
+
+    cg = bc.observations["Canada Goose"]
+    print(bc._collect_period_samp_sizes(tp))
+    print(bc._collect_period_observations(tp)["Canada Goose"])
+
+    summ = bc.new_period_summary(tp)
+    print(summ.observations["Canada Goose"])
