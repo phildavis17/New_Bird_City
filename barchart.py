@@ -3,8 +3,7 @@ import csv
 import json
 import math
 
-from datetime import date
-from os import stat
+from file_manager import FileManager
 from pathlib import Path
 
 
@@ -16,7 +15,7 @@ class Barchart:
     BC_FILE_OBS_START_ROW = 16
 
     def __init__(self) -> None:
-        self.timestamp = date.today().strftime("%y%m%d")
+        self.timestamp = FileManager.get_timestamp()
 
     @staticmethod
     def new_from_csv(csv_path):
@@ -27,7 +26,7 @@ class Barchart:
 
     def ingest_csv(self, csv_path: Path) -> None:
         """Populates Barchart data from a provided eBird barchart file."""
-        row_list = self.read_csv_file(csv_path)
+        row_list = self._read_csv_file(csv_path)
         samps = [int(float(x)) for x in row_list[self.BC_FILE_SAMP_SIZE_ROW][1:] if x]
         obs = {}
         for row in self.filter_observation_rows(row_list[self.BC_FILE_OBS_START_ROW :]):
@@ -38,7 +37,7 @@ class Barchart:
         self.observations = obs
 
     @staticmethod
-    def read_csv_file(csv_path: Path) -> list:
+    def _read_csv_file(csv_path: Path) -> list:
         """Returns a the lines of an eBird Barchart File as a list. Does no filtering."""
         with open(csv_path, "r") as in_file:
             row_list = []
@@ -75,10 +74,14 @@ class Barchart:
         # TODO: Core
         pass
 
-    def to_json_string(self) -> str:
+    def _to_json_string(self) -> str:
         """Creates a json compatable string representation of this Barchart object."""
-        # TODO: Core
-        pass
+        out_dict = {}
+        out_dict["loc_id"] = self.loc_id
+        out_dict["timestamp"] = self.timestamp
+        out_dict["samp_sizes"] = self.samp_sizes
+        out_dict["observations"] = self.observations
+        return json.dumps(out_dict)
 
     @staticmethod
     def stash_json(out_path: Path) -> None:
@@ -206,6 +209,13 @@ class Barchart:
         summ.observations = self.summarize_period(period)
         return summ
 
+    def _make_filename(self):
+        filename = f"{self.loc_id}_barchart_{self.timestamp}"
+        return filename
+
+    def stash_json(self):
+        FileManager.stash_barcart_json(self._make_filename(), self._to_json_string())
+
     def summarize_all_periods_to_folder(self, out_folder: Path) -> None:
         # TODO: Core
         pass
@@ -220,7 +230,7 @@ class Barchart:
 class Summary:
     def __init__(self) -> None:
         self.loc_id = ""
-        self.period = -1
+        self.period = None
         self.timestamp = ""
         self.observations = {}
 
@@ -235,20 +245,40 @@ class Summary:
 
     def to_json_string(self) -> str:
         """Returns a json compatable string representation of this Summary."""
-        pass
+        out_dict = {}
+        out_dict["loc_id"] = self.loc_id
+        out_dict["period"] = self.period
+        out_dict["timestamp"] = self.timestamp
+        out_dict["observations"] = self.observations
+        return str(out_dict)
+
+    def make_filename(self) -> str:
+        filename = f"{self.loc_id}_{self.period}_summary_{self.timestamp}"
+        return filename
+
+    def stash_json(self) -> None:
+        json_str = self.to_json_string()
+        filename = self.make_filename()
+        # FileManager.stash_json()
 
 
 if __name__ == "__main__":
-    TEST_FILE = Path(
-        R"C:\Users\Phil\Desktop\Buffer\ebird_L2741553__1900_2021_1_12_barchart.txt"
+    TEST_FILE = (
+        Path(__file__).parent
+        / "data"
+        / "testing"
+        / "ebird_L2741553__1900_2021_1_12_barchart.txt"
+    )
+
+    TEST_FILE_2 = (
+        Path(__file__).parent
+        / "data"
+        / "testing"
+        / "ebird_L109516__1900_2021_1_12_barchart.txt"
     )
 
     bc = Barchart.new_from_csv(TEST_FILE)
-    tp = 2
-
-    cg = bc.observations["Canada Goose"]
-    print(bc._collect_period_samp_sizes(tp))
-    print(bc._collect_period_observations(tp)["Canada Goose"])
-
-    summ = bc.new_period_summary(tp)
-    print(summ.observations["Canada Goose"])
+    bc2 = Barchart.new_from_csv(TEST_FILE_2)
+    # print(type(bc._to_json_string()))
+    bc.stash_json()
+    bc2.stash_json()
