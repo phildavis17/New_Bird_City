@@ -2,7 +2,10 @@ import csv
 import json
 import os
 
+# from analysis import Analysis, Trip
+from barchart import Barchart, Summary
 from datetime import date
+from functools import singledispatch
 from pathlib import Path
 from typing import Optional
 
@@ -125,3 +128,52 @@ class FileManager:
             return None
         else:
             cls._write_json(cls.BARCHART_FOLDER, filename, json_string)
+
+
+class FileNameMaker:
+    def __init__(self) -> None:
+        pass
+
+    @singledispatch
+    def make_filename(item):
+        pass
+
+    @make_filename.register
+    def _(item: Barchart) -> str:
+        filename = f"{item.loc_id}_barchart_{item.timestamp}"
+        return filename
+
+    @make_filename.register
+    def _(item: Summary) -> str:
+        filename = f"{item.loc_id}_summary_{item.period}_{item.timestamp}"
+        return filename
+
+    @make_filename.register
+    def _(item: Analysis) -> str:
+        filename = f"{item.title}_analysis_{item.period}"
+        return filename
+
+    @make_filename.register
+    def _(item: Trip) -> str:
+        filename = f"{item.title}_trip_{item.period}_{item.parks_bv}"
+        return filename
+
+    def parse_filename(filename: str) -> Optional[dict]:
+        filetype = filename.split("_")[1]
+
+    def _parse_summary_filename(filename) -> dict:
+        fn_indeces = {"loc_id": 0, "peroid": 2, "timestamp": 3}
+        parts = filename.split("_")
+        outdict = {}
+        for part, index in fn_indeces.items():
+            outdict[part] = parts[index]
+        return outdict
+
+    def _parse_barchart_filename(filename) -> dict:
+        pass
+
+    def _parse_analysis_filename(filename) -> dict:
+        pass
+
+    def _parse_trip_filename(filename) -> dict:
+        pass
