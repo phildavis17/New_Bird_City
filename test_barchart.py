@@ -5,12 +5,19 @@ from barchart import Barchart
 from pathlib import Path
 
 
-TEST_FILE = Path(
-    R"C:\Users\Phil\Desktop\Buffer\ebird_L2741553__1900_2021_1_12_barchart.txt"
+TEST_FILE = (
+    Path(__file__).parent
+    / "data"
+    / "testing"
+    / "ebird_L2741553__1900_2021_1_12_barchart.txt"
 )
 
-TEST_FILE_2 = Path(
-    R"C:\Users\Phil\Desktop\Buffer\ebird_L109516__1900_2021_1_12_barchart.txt"
+
+TEST_FILE_2 = (
+    Path(__file__).parent
+    / "data"
+    / "testing"
+    / "ebird_L109516__1900_2021_1_12_barchart.txt"
 )
 
 
