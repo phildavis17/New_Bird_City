@@ -1,9 +1,9 @@
 import calendar
 import csv
+import file_manager as fm  # Aliased to prevent circular import
 import json
 import math
 
-from file_manager import FileManager
 from pathlib import Path
 
 
@@ -15,7 +15,7 @@ class Barchart:
     BC_FILE_OBS_START_ROW = 16
 
     def __init__(self) -> None:
-        self.timestamp = FileManager.get_timestamp()
+        self.timestamp = fm.FileManager.get_timestamp()
 
     @staticmethod
     def new_from_csv(csv_path):
@@ -82,12 +82,6 @@ class Barchart:
         out_dict["samp_sizes"] = self.samp_sizes
         out_dict["observations"] = self.observations
         return json.dumps(out_dict)
-
-    @staticmethod
-    def stash_json(out_path: Path) -> None:
-        # TODO: Core
-        # This should check to make sure there is not an existing version of this hotspot in the folder
-        pass
 
     @classmethod
     def get_period_columns(cls, n: int) -> list:
@@ -201,7 +195,7 @@ class Barchart:
         return summary_dict
 
     def new_period_summary(self, period: int):
-        # TODO: Core
+        """Returns a new Summary object with data for the specified period."""
         summ = Summary()
         summ.loc_id = self.loc_id
         summ.period = period
@@ -209,12 +203,9 @@ class Barchart:
         summ.observations = self.summarize_period(period)
         return summ
 
-    def _make_filename(self):
-        filename = f"{self.loc_id}_barchart_{self.timestamp}"
-        return filename
-
     def stash_json(self):
-        FileManager.stash_barcart_json(self._make_filename(), self._to_json_string())
+        filename = fm.FileNameMaker.make_filename(self)
+        fm.FileManager.stash_barcart_json(filename, self._to_json_string())
 
     def summarize_all_periods_to_folder(self, out_folder: Path) -> None:
         # TODO: Core
@@ -252,14 +243,10 @@ class Summary:
         out_dict["observations"] = self.observations
         return str(out_dict)
 
-    def make_filename(self) -> str:
-        filename = f"{self.loc_id}_{self.period}_summary_{self.timestamp}"
-        return filename
-
     def stash_json(self) -> None:
         json_str = self.to_json_string()
-        filename = self.make_filename()
-        # FileManager.stash_json()
+        filename = fm.FileNameMaker.make_filename(self)
+        fm.FileManager.stash_summary_json(filename, json_str)
 
 
 if __name__ == "__main__":
