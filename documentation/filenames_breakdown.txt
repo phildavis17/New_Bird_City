@@ -1,11 +1,11 @@
 Barchart Files
-{locid}_barchart_{timestamp}
+barchart_{locid}_{timestamp}
 
 Summary Files
-{locid}_{period}_summary_{timestamp}
+summary_{locid}_{period}_{timestamp}
 
 Analysis Files
-{Analysis Name}_{Period}
+analysis_{Analysis Name}_{Period}
 
 Trip Files
-{Analysis Name}_{Parks Bit Vector}
+trip_{Analysis Name}_{Parks Bit Vector}
