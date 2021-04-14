@@ -1,8 +1,8 @@
 import calendar
 import csv
-import file_manager as fm  # Aliased to prevent circular import
 import json
 import math
+import file_manager as fm  # Aliased to prevent circular import
 
 from pathlib import Path
 
@@ -13,9 +13,13 @@ class Barchart:
     )  # This is the offset to get the correct columns from eBird barchart files.
     BC_FILE_SAMP_SIZE_ROW = 14
     BC_FILE_OBS_START_ROW = 16
+    PERIODS = tuple(range(48))
 
     def __init__(self) -> None:
-        self.timestamp = fm.FileManager.get_timestamp()
+        self.timestamp = fm.TimeKeeper.get_timestamp()
+        self.loc_id = ""
+        self.samp_sizes = []
+        self.observations = {}
 
     @staticmethod
     def new_from_csv(csv_path):
@@ -32,7 +36,7 @@ class Barchart:
         for row in self.filter_observation_rows(row_list[self.BC_FILE_OBS_START_ROW :]):
             sp_name = self.clean_sp_name(row[0])
             obs[sp_name] = [float(x) for x in row[1:] if x]
-        self.loc_id = self.loc_id_from_filename(csv_path)
+        self.loc_id = self.loc_id_from_ebird_barchart(csv_path)
         self.samp_sizes = samps
         self.observations = obs
 
@@ -56,8 +60,11 @@ class Barchart:
         return filtered
 
     @staticmethod
-    def loc_id_from_filename(csv_path: Path) -> str:
-        """Returns the location ID of a hotspot from an eBird bar chart file name. Assumes file has not been renamed."""
+    def loc_id_from_ebird_barchart(csv_path: Path) -> str:
+        """
+        Returns the location ID of a hotspot from an eBird bar chart file name. Assumes file has not been renamed.
+        Differes from similar method in FileManager, as it deals with eBird files, not files named by this app.
+        """
         return csv_path.stem.split("_")[1]
 
     @classmethod
@@ -67,7 +74,11 @@ class Barchart:
 
     def ingest_json(self, json_path: Path):
         # TODO: Core
-        pass
+        in_dict = json.load(json_path)
+        self.loc_id = in_dict["loc_id"]
+        self.timestamp = in_dict["timestamp"]
+        self.samp_sizes = in_dict["samp_sizes"]
+        self.observations = in_dict["observations"]
 
     @staticmethod
     def read_json_file(json_path: Path):
@@ -87,8 +98,8 @@ class Barchart:
     def get_period_columns(cls, n: int) -> list:
         cols = []
         for i in range(4):
-            c = (n + i + cls.BC_FILE_COL_OFFSET) % 48
-            cols.append(c)
+            col = (n + i + cls.BC_FILE_COL_OFFSET) % 48
+            cols.append(col)
         return cols
 
     @staticmethod
@@ -167,7 +178,7 @@ class Barchart:
         return self.observations[sp_name][index]
 
     def _collect_period_samp_sizes(self, period: int) -> list:
-        """Returns the sample sizes for the supplied period"""
+        """Returns the sample sizes for the supplied period."""
         indecies = self.get_period_columns(period)
         samps = []
         for i in indecies:
@@ -207,7 +218,7 @@ class Barchart:
         filename = fm.FileNameMaker.make_filename(self)
         fm.FileManager.stash_barcart_json(filename, self._to_json_string())
 
-    def summarize_all_periods_to_folder(self, out_folder: Path) -> None:
+    def summarize_and_stash_all_periods(self) -> None:
         # TODO: Core
         pass
 
@@ -231,8 +242,8 @@ class Summary:
     def __len__(self) -> int:
         return len(self.observations)
 
-    def get_species(self) -> list:
-        return self.observations.keys()
+    # def get_species(self) -> list:
+    #    return self.observations.keys()
 
     def to_json_string(self) -> str:
         """Returns a json compatable string representation of this Summary."""
@@ -247,6 +258,12 @@ class Summary:
         json_str = self.to_json_string()
         filename = fm.FileNameMaker.make_filename(self)
         fm.FileManager.stash_summary_json(filename, json_str)
+
+    @classmethod
+    def new_from_json(cls):
+        """Returns a new Summary object from a supplied JSON file."""
+        # TODO: Core
+        pass
 
 
 if __name__ == "__main__":
@@ -267,5 +284,7 @@ if __name__ == "__main__":
     bc = Barchart.new_from_csv(TEST_FILE)
     bc2 = Barchart.new_from_csv(TEST_FILE_2)
     # print(type(bc._to_json_string()))
-    bc.stash_json()
-    bc2.stash_json()
+    # bc.stash_json()
+    # bc2.stash_json()
+
+    print(bc.__class__.__name__.lower() == "Barchart".lower())

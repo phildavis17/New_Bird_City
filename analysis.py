@@ -1,6 +1,11 @@
 class Analysis:
-    pass
+    def __init__(self) -> None:
+        self.title = ""
+        self.period = None
 
 
 class Trip:
-    pass
+    def __init__(self) -> None:
+        self.title = ""
+        self.period = None
+        self.hs_bv = None

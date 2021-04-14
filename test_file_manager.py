@@ -29,11 +29,11 @@ def test_timestamp_delta():
     dif_year = "20220408"
     dif_all = "20200307"
 
-    assert FileManager.find_timestamp_delta(base_ts, dif_day) == [0, 0, 1]
-    assert FileManager.find_timestamp_delta(base_ts, dif_month) == [0, 1, 0]
-    assert FileManager.find_timestamp_delta(base_ts, dif_year) == [1, 0, 0]
-    assert FileManager.find_timestamp_delta(base_ts, dif_all) == [1, 1, 1]
-    assert FileManager.find_timestamp_delta(base_ts, base_ts) == [0, 0, 0]
+    assert FileManager._find_timestamp_delta(base_ts, dif_day) == [0, 0, 1]
+    assert FileManager._find_timestamp_delta(base_ts, dif_month) == [0, 1, 0]
+    assert FileManager._find_timestamp_delta(base_ts, dif_year) == [1, 0, 0]
+    assert FileManager._find_timestamp_delta(base_ts, dif_all) == [1, 1, 1]
+    assert FileManager._find_timestamp_delta(base_ts, base_ts) == [0, 0, 0]
 
 
 def test_file_exists_for_location():
