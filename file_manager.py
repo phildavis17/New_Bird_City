@@ -1,12 +1,14 @@
 import json
+import logging
 import os
-
+import barchart as dt
 
 from datetime import date
 from pathlib import Path
-from typing import Optional, Union
-from analysis import Analysis, Trip
-from barchart import Barchart, Summary
+from typing import Union
+
+# from analysis import Analysis, Trip
+# from barchart import Barchart, Summary
 
 
 class FileManager:
@@ -27,21 +29,17 @@ class FileManager:
     def __init__(self) -> None:
         pass
 
-    @classmethod
-    def get_most_recent_data_for_location(
-        cls, loc_id: str, folder: str
-    ) -> Optional[str]:
-        """Returns the filename of the most recent file for the supplied loc id in the supplied folder. Returns None if no such file is found."""
-        # TODO: this is busted
-        files = cls.request_matching_files(folder, loc_id=loc_id)
-        if not files:
-            return None
+    @staticmethod
+    def _scan_files(folder: str) -> list:
+        """Yields the files in the supplied folder."""
+        for (_, _, files) in os.walk(folder):
+            for f in files:
+                yield f
 
     @staticmethod
-    def pick_most_recent_file(file_list: list) -> str:
+    def _pick_most_recent_file(file_list: list) -> str:
         """Returns the filename with the most recent timestamp from a list of supplied filenames."""
         if not file_list:
-            # TODO: I don't think this check should happen here. It should happen earlier.
             raise ValueError("Empty list supplied")
         index = 0
         highest = 0
@@ -52,84 +50,52 @@ class FileManager:
                 index = i
         return file_list[index]
 
-    @classmethod
-    def get_files_for_location(cls, loc_id: str, folder: str) -> list:
-        """Returns a list of files in the specified folder related to the supplied loc_id. Returns an empty list if none found."""
-        files = []
-        for file in cls.scan_files(Path(folder)):
-            if FileNameMaker.loc_id_from_filename(file) == loc_id:
-                files.append(file)
-        return files
-
     @staticmethod
     def _write_json(file_path: Path, file_name: str, json_string: str) -> None:
+        file_name += ".json"
         full_path = Path(file_path) / file_name
         with open(full_path, "w") as out_file:
             json.dump(json_string, out_file)
-
-    @staticmethod
-    def scan_files(folder: str) -> list:
-        """Yields the files in the supplied folder."""
-        for (_, _, files) in os.walk(folder):
-            for f in files:
-                yield f
+            logging.info(f"json file written: {full_path}")
 
     @classmethod
-    def request_matching_files(cls, folder: Path, **target_parts: str) -> list:
-        for part in target_parts:
+    def _request_colliding_files(cls, folder: Path, target_dict: dict) -> list:
+        """
+        Returns a list of files in the supplied folder that collide with the supplied filename parts.
+        Returns an empty list if none are found.
+        """
+        for part in target_dict:
             if part not in FileNameMaker.FN_PARTS:
-                raise ValueError("Invalid Filename component.")
+                raise ValueError(f"Invalid Filename component: {part}")
         matching_files = []
-        for file in cls.scan_files(folder):
-            if FileNameMaker.file_matches(file, *target_parts):
-                matching_files.append(file)
+        for filename in cls._scan_files(folder):
+            if FileNameMaker.filename_collides(filename, target_dict):
+                matching_files.append(filename)
         return matching_files
 
     @classmethod
-    def stash_barcart_json(cls, filename: str, json_string: str) -> None:
-        """Saves a json file if a current file for that location is not present. If there is a current file, does nothing."""
-        #! LOGGING!
-        loc_id = FileNameMaker.loc_id_from_filename(filename)
-        most_recent_existing = cls.get_most_recent_data_for_location(
-            loc_id, cls.DATA_FOLDERS["barchart"]
-        )
-        if most_recent_existing and TimeKeeper.timestamp_is_current(
-            FileNameMaker.timestamp_from_filename(most_recent_existing)
-        ):
-            return
-        else:
-            filename += ".json"
-            cls._write_json(cls.DATA_FOLDERS["barchart"], filename, json_string)
-
-    @classmethod
-    def stash_summary_json(cls, filename: str, json_string: str) -> None:
-        """Saves a json file if a current file for that location and period is not present. Does nothing otherwise."""
-        # TODO: Core
-        #! Logging
-        loc_id = FileNameMaker.loc_id_from_filename(filename)
-        period = FileNameMaker.period_from_filename(filename)
-
-    @classmethod
-    def stash_analysis_json(cls, filename: str, json_string: str) -> None:
-        """Saves a json file for an Analysis object. Overwrites any existing files."""
-        # TODO: Core
-        #! Logging
-        pass
-
-    @classmethod
-    def stash_trip_json(cls, filename: str, json_string: str) -> None:
-        """Saves a json file for a Trip object. Overwrites any existing files."""
-        # TODO: Core
-        #! Logging
-        pass
+    def _good_file_exists(cls, folder: Path, filename: str) -> bool:
+        """Returns True if a file already exists covering the data that would be stored by a file with the supplied filename."""
+        target_dict = FileNameMaker.parse_filename(filename)
+        colliding_files = cls._request_colliding_files(folder, target_dict)
+        if not colliding_files:
+            return False
+        #  If the file has a timestamp, it has to be current to be a conflict.
+        if "timestamp" in target_dict:
+            most_recent = cls._pick_most_recent_file(colliding_files)
+            most_recent_timestamp = FileNameMaker.timestamp_from_filename(most_recent)
+            return TimeKeeper.timestamp_is_current(most_recent_timestamp)
+        return True
 
     @classmethod
     def stash_json(cls, filename: str, json_string: str) -> None:
-        # Barchart: write if no current file (loc_id)
-        # Summary: Write if no current file (loc_id, period)
-        # Analysis: Overwrite. All that changes is the bitvector (should these even be written, then???)
-        # Trip: Static, I think. write if none present.
-        pass
+        """Writes a JSON file to the appropriate folder, unless a good colliding filename is found."""
+        file_type = FileNameMaker.parse_filename(filename)["type"]
+        folder = cls.DATA_FOLDERS[file_type]
+        if cls._good_file_exists(folder, filename):
+            logging.info("Existing good file found. No file written.")
+            return
+        cls._write_json(folder, filename, json_string)
 
 
 class TimeKeeper:
@@ -143,7 +109,7 @@ class TimeKeeper:
         pass
 
     @staticmethod
-    def get_timestamp() -> str:
+    def generate_timestamp() -> str:
         """Returns a current timestamp string in ISO 8601 format 'YYYYMMDD'.
         NOTE: This should only be invoked for storage assignment during the creation of a new Barchart object.
         All other objects with timestamps get theirs from the Barchart from which they are derived."""
@@ -162,7 +128,7 @@ class TimeKeeper:
         RULES:
             - Must be 8 numeric characters.
             - Month portion must be greater than 0 and less than 13.
-            - Day portion must be greater than 0 and less tan 32.
+            - Day portion must be greater than 0 and less than 32.
         """
         rules = []
         rules.append(len(timestamp) == 8)
@@ -177,7 +143,7 @@ class TimeKeeper:
     @classmethod
     def timestamp_is_current(cls, timestamp: str) -> bool:
         "Returns True if the supplied timestamp is from the current month. Otherwise returns False"
-        today = cls.get_timestamp()
+        today = cls.generate_timestamp()
         deltas = cls._find_timestamp_delta(today, timestamp)
         return deltas[:2] == [0, 0]
 
@@ -201,6 +167,12 @@ class FileNameMaker:
         "analysis": ("type", "title", "period"),
         "trip": ("type", "title", "period", "hs_bv"),
     }
+    COLLISION_MATCH_PARTS = {
+        "barchart": ("loc_id",),
+        "summary": ("loc_id", "period"),
+        "analysis": ("title",),
+        "trip": ("title", "hs_bv"),
+    }
     FN_PARTS = ("type", "loc_id", "title", "period", "timestamp", "hs_bv")
     SEPERATOR = "_"
     TYPE_INDEX = 0
@@ -210,7 +182,7 @@ class FileNameMaker:
 
     @classmethod
     def _get_fn_identifiers(
-        cls, item: Union[Barchart, Summary, Analysis, Trip]
+        cls, item: Union["Barchart", "Summary", "Analysis", "Trip"]
     ) -> dict:
         """Returns a dict of the attributes used in that type's filename."""
         part_dict = {}
@@ -221,14 +193,16 @@ class FileNameMaker:
         return part_dict
 
     @classmethod
-    def make_filename(cls, item: Union[Barchart, Summary, Analysis, Trip]) -> str:
+    def make_filename(
+        cls, item: Union["Barchart", "Summary", "Analysis", "Trip"]
+    ) -> str:
         """Returns a filename string that represents the supplied object."""
         parts_dict = cls._get_fn_identifiers(item)
         item_type = parts_dict["type"]
         fn_list = []
         template = cls.FN_BLUEPRINTS[item_type]
         for part in template:
-            fn_list.append(parts_dict[part])
+            fn_list.append(str(parts_dict[part]))
         filename = cls.SEPERATOR.join(fn_list)
         cls._validate_filename(filename)
         return filename
@@ -259,11 +233,21 @@ class FileNameMaker:
         return filename.split(cls.SEPERATOR)
 
     @classmethod
-    def file_matches(cls, filename, target_parts_dict: dict) -> bool:
+    def filename_matches(cls, filename, target_parts_dict: dict) -> bool:
         """Returns True if the supplied filename matches the specified parts."""
         file_parts = cls.parse_filename(filename)
         for part in target_parts_dict:
             if file_parts[part] != target_parts_dict[part]:
+                return False
+        return True
+
+    @classmethod
+    def filename_collides(cls, target_filename: str, check_parts: dict) -> bool:
+        """Returns True if the """
+        target_parts = cls.parse_filename(target_filename)
+        file_type = target_parts["type"]
+        for part in cls.COLLISION_MATCH_PARTS[file_type]:
+            if check_parts[part] != target_parts[part]:
                 return False
         return True
 
@@ -314,7 +298,7 @@ class FileNameMaker:
 
         RULES: Must convert to an int within the range specified in the Barchart object's attribute.
         """
-        check = int(period) in Barchart.PERIODS
+        check = int(period) in dt.Barchart.PERIODS
         if not check:
             raise ValueError(f"Improper Period identifier: {period}")
         return True

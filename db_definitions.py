@@ -1,4 +1,3 @@
-
 from sqlalchemy import Column, ForeignKey, Integer, String, engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship, sessionmaker
@@ -6,7 +5,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.sql.expression import null
 from sqlalchemy.sql.sqltypes import Boolean, Float, TIMESTAMP
 
-engine = create_engine('sqlite:///data/test.db')
+engine = create_engine("sqlite:///data/test.db")
 
 Base = declarative_base()
 
@@ -20,7 +19,7 @@ class Species(Base):
 
 
 class Hotstpot(Base):
-    __tablename__="Hotspots"
+    __tablename__ = "Hotspots"
     LocId = Column(String(10), primary_key=True)
     Name = Column(String(100), nullable=False)
     Timestamp = Column(Float, nullable=False)

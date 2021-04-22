@@ -20,27 +20,28 @@ import json
 # pyenv-win
 # chocolaty
 
+
 def combined_average(samp_size, presence):
     """Takes two lists of numbers and returns the combined average as a float.
-    
+
     Args:
         samp_size: A list  of sample sizes as floats.
         presence: A list of occurance data as floats.
-    
+
     Returns:
         The combined average as a float
-    
+
     Raises:
-        IndexError: The function will give unexpected results if the lists are 
+        IndexError: The function will give unexpected results if the lists are
         of different lengths, so it raises an IndexError rather than failing silently.
     """
     if not len(samp_size) == len(presence):
-        raise IndexError('Lists must have the same length.')
+        raise IndexError("Lists must have the same length.")
     total_num_present = 0
     data = zip(samp_size, presence)
     for pair in data:
         total_num_present += round(pair[0] * pair[1])
-    return total_num_present/sum(samp_size)
+    return total_num_present / sum(samp_size)
 
 
 def generate_species_list(dicts):
@@ -56,29 +57,29 @@ def generate_species_list(dicts):
 def make_period_bounds(period):
     """Returns the column numbers that correspond to the chosen period in an eBird barchart data file."""
     month_index = {
-        'jan': 1,
-        'feb': 5,
-        'mar': 9,
-        'apr': 13,
-        'may': 17,
-        'jun': 21,
-        'jul': 25, 
-        'aug': 29,
-        'sep': 33,
-        'oct': 37,
-        'nov': 41,
-        'dec': 45,
+        "jan": 1,
+        "feb": 5,
+        "mar": 9,
+        "apr": 13,
+        "may": 17,
+        "jun": 21,
+        "jul": 25,
+        "aug": 29,
+        "sep": 33,
+        "oct": 37,
+        "nov": 41,
+        "dec": 45,
     }
     return month_index[period], month_index[period] + 4
 
 
 def summarize_barchart_file(file, period):
     """Summarizes occurance data in an eBird bar chart data txt file over a specified period.
-    
+
     Args:
         file: The path to the file to summarize.
         period: A string indicating the period to summarize.
-        
+
     Returns:
         A dict summarizing occurance data over the specified period
     """
@@ -86,12 +87,16 @@ def summarize_barchart_file(file, period):
     samp_size = []
     bird_dict = {}
     with open(file) as tsv_file:
-        hotspot_file = csv.reader(tsv_file, dialect='excel-tab')
+        hotspot_file = csv.reader(tsv_file, dialect="excel-tab")
         for row_num, row in enumerate(hotspot_file):
-            if row_num == 14:  # Sample size information is on the 14th line of eBird bar chard data
+            if (
+                row_num == 14
+            ):  # Sample size information is on the 14th line of eBird bar chard data
                 samp_size = list(map(float, row[p_start:p_end]))
             if row_num >= 16 and len(row):  # Occurance data starts on line 16
-                sp_name = row[0].split('(<')[0].strip()  # Strip HTML tag from species name if present
+                sp_name = (
+                    row[0].split("(<")[0].strip()
+                )  # Strip HTML tag from species name if present
                 raw_bird_data = list(map(float, row[p_start:p_end]))
                 bird_summary = combined_average(samp_size, raw_bird_data)
                 bird_dict[sp_name] = bird_summary
@@ -103,7 +108,7 @@ def summarize_barchart_files(files, period):
 
     Extracts hotspot names from the names of supplied files, splitting at the first underscore. Requires filenames to take the form "Hotspot Name_..."
     Args:
-        files: A list of files to be summarized 
+        files: A list of files to be summarized
         period:
 
     Returns: A dict of dicts in the following format
@@ -111,23 +116,25 @@ def summarize_barchart_files(files, period):
     """
     master_dict = {}
     for file in files:
-        hotspot_name = str(file.stem).split('_')[0].strip()
-        master_dict[hotspot_name] = filter_bird_dict(summarize_barchart_file(file, period))
+        hotspot_name = str(file.stem).split("_")[0].strip()
+        master_dict[hotspot_name] = filter_bird_dict(
+            summarize_barchart_file(file, period)
+        )
     return master_dict
 
 
 def is_good_species(species):
     """Tests a supplied species name for substrings that indicate it is a sub-species level taxon."""
-    flag_strings = [' sp.', ' x ', '/', 'Domestic']
+    flag_strings = [" sp.", " x ", "/", "Domestic"]
     for flag in flag_strings:
         if flag.lower() in species.lower():
             return False
     return True
 
 
-def filter_bird_dict(b_dict, r_digits=5): 
+def filter_bird_dict(b_dict, r_digits=5):
     """Filters keys of supplied dict.
-    
+
     Removes sub-species level taxons, birds that were not seen in the specified period,
     and rounds value to a specified length.
     """
@@ -135,12 +142,12 @@ def filter_bird_dict(b_dict, r_digits=5):
     for bird in b_dict:
         if not b_dict[bird] == 0.0 and is_good_species(bird):
             filtered_dict[bird] = round(b_dict[bird], r_digits)
-    return(filtered_dict)
+    return filtered_dict
 
 
 def species_dict_from_hotspot_dict(sp_list, m_dict):
     """Converts a hotspot oriented dict to a species oriented dict.
-    
+
     Returned dict will be of following format:
         {'Bird1: {'Hotspot1': 0.23, 'Hotspot2': 0.42,...}, 'Bird2': {'Hotspot1': 0.84, 'Hotspot2': 0.77,...},...}
     """
@@ -163,9 +170,9 @@ def write_csv_file(file_location, sp_data):
         for hotspot in bird.keys():
             if not hotspot in hotspot_names:
                 hotspot_names.append(hotspot)
-    hotspot_names.insert(0, 'Species')
+    hotspot_names.insert(0, "Species")
 
-    with open(file_location, 'w', newline='') as out_file:
+    with open(file_location, "w", newline="") as out_file:
         writer = csv.writer(out_file, hotspot_names)
         writer.writerow(hotspot_names)
         for bird_dict in sp_data:
@@ -175,24 +182,24 @@ def write_csv_file(file_location, sp_data):
 
 
 def write_json_file(file_location, sp_data):
-    '''Records supplied species oriented dict to a JSON file at the supplied location'''
+    """Records supplied species oriented dict to a JSON file at the supplied location"""
     data_dict = {}
     hotspot_names = []
     for bird in sp_data.values():
         for hotspot in bird.keys():
             if not hotspot in hotspot_names:
                 hotspot_names.append(hotspot)
-        break    
+        break
     hotspot_names = sorted(hotspot_names)
-    
+
     bird_dict = {}
     for bird in sp_data:
         bird_dict[bird] = sp_data[bird]
-    
-    data_dict['Hotspot Names'] = hotspot_names
-    data_dict['Birds'] = bird_dict
 
-    with open(file_location, 'w') as out_file:
+    data_dict["Hotspot Names"] = hotspot_names
+    data_dict["Birds"] = bird_dict
+
+    with open(file_location, "w") as out_file:
         json.dump(data_dict, out_file)
 
 
@@ -206,22 +213,28 @@ def sort_species_dict(sp_dict):
             this_sp = row[3]
             if this_sp in sp_dict.keys():
                 sorted_sp_dict[this_sp] = sp_dict[this_sp]
-    return sorted_sp_dict        
+    return sorted_sp_dict
 
 
 def main():
     """Summarizes the bar chart data files in a folder for a specified month, and writes a CSV to a specified location."""
-    DATA_FOLDER = Path(R'D:\Douments\Code\New Bird City\Whole Year Data')  # Change data location here.
+    DATA_FOLDER = Path(
+        R"D:\Douments\Code\New Bird City\Whole Year Data"
+    )  # Change data location here.
 
-    parser = argparse.ArgumentParser(description='Read eBird Bar Chart Data txt files, and create a CSV file summarizing occurance data over a specified month.')
-    parser.add_argument('ouput_location', type=str, help='The output location for the created CSV file.')
-    parser.add_argument('month', type=str, help='The month to summarize.')
+    parser = argparse.ArgumentParser(
+        description="Read eBird Bar Chart Data txt files, and create a CSV file summarizing occurance data over a specified month."
+    )
+    parser.add_argument(
+        "ouput_location", type=str, help="The output location for the created CSV file."
+    )
+    parser.add_argument("month", type=str, help="The month to summarize.")
 
     args = parser.parse_args()
     out_file_path = Path(args.ouput_location)
     month = args.month.lower()[:3]
 
-    file_name_list = DATA_FOLDER.glob('*.txt')
+    file_name_list = DATA_FOLDER.glob("*.txt")
     file_list = []
     for file in file_name_list:
         file_list.append(DATA_FOLDER / file)
@@ -229,36 +242,42 @@ def main():
     master_hotspot_dict = summarize_barchart_files(file_list, month)
     species_list = generate_species_list(master_hotspot_dict.values())
 
-    master_species_dict = species_dict_from_hotspot_dict(species_list, master_hotspot_dict)
+    master_species_dict = species_dict_from_hotspot_dict(
+        species_list, master_hotspot_dict
+    )
 
     sorted_master_dict = sort_species_dict(master_species_dict)
 
-    #write_csv_file(out_file_path, sorted_master_dict)
+    # write_csv_file(out_file_path, sorted_master_dict)
     write_json_file(out_file_path, sorted_master_dict)
-    print(f"Summary file written for {len(species_list)} species and {len(file_list)} hotspots.")
+    print(
+        f"Summary file written for {len(species_list)} species and {len(file_list)} hotspots."
+    )
 
 
 def test():
     # Testing Supplies
-    TEST_FILE = Path(R'D:\Douments\Code\New Bird City\Test Data\Greenwood Cemetery_L285884__2010_2020_1_12_barchart.txt')
-    TEST_DATA_FOLDER = Path(R'D:\Douments\Code\New Bird City\Test Data')
+    TEST_FILE = Path(
+        R"D:\Douments\Code\New Bird City\Test Data\Greenwood Cemetery_L285884__2010_2020_1_12_barchart.txt"
+    )
+    TEST_DATA_FOLDER = Path(R"D:\Douments\Code\New Bird City\Test Data")
     TEST_OUT_FILE = "eBird_test.csv"
     TEST_SAMP_SIZE = [266, 235, 209, 112]
     TEST_PRES_DATA = [0.725564, 0.731915, 0.698565, 0.660714]
-    
-    file_name_list = TEST_DATA_FOLDER.glob('*.txt')
+
+    file_name_list = TEST_DATA_FOLDER.glob("*.txt")
     file_list = []
     for file in file_name_list:
         file_list.append(TEST_DATA_FOLDER / file)
 
-    m_dict = summarize_barchart_files(file_list, 'jan')
-    sp_list = generate_species_list(m_dict.values())    
+    m_dict = summarize_barchart_files(file_list, "jan")
+    sp_list = generate_species_list(m_dict.values())
     master_sp_dict = species_dict_from_hotspot_dict(sp_list, m_dict)
-    
+
     write_csv_file(TEST_OUT_FILE, master_sp_dict)
 
 
-if __name__ == '__main__':
-    #import sys
-    #print(sys.path)
+if __name__ == "__main__":
+    # import sys
+    # print(sys.path)
     main()
