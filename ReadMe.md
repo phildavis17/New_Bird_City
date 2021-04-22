@@ -1,24 +1,18 @@
-# eBird Trip Planner
+# New Bird City
 
-A Python library to help turn eBird Bar Chart Data into a plan of action for a birding trip.
+A Python tool to help summarize, compare, and learn from eBird Barchart Data.
 
-eBird allows users to download the bar chart data for any hotspot, but that data is provided in a format that can be difficult to use. The intent of this script is to summarize that data, and reformat it into something a little more useful. This script will turn several txt files with full-year barchart data into a single CSV file summarizing the observation data for every bird at every hotspot included for a specified month.
-
-## Installation
-
-TK
+eBird allows users to download "barchart data," which contains presence/absence data for each species reported at a hotspot for 48 slices of the year. This data is incredibly useful for getting familiar with the birds you are likely to encounter in a new area, but it is presented in a way that requires an inconvenient amount of manipulation before it can be useful. This library is intended to handle that manipulation behind the scenes, and surface the information that birders need to get ready for a trip.
 
 ## Usage
 
 ### Step 1 - Download Data
 
-You will need to download 2 sets of data for this script to work properly.
+The first step is to collect the barchart data for the hotspots you'd like to know more about.
 
 - **Hotspot Data** - Download the eBird bar chart data for the hotspots you would like to summarize. This data should be for the entire year, but the span of years included is up to you. These files should be in a folder by themselves. The script will ingest any .txt file it finds in the target folder, and will not know what to do with non-ebird files. **Note:** you must rename these files. Since eBird bar chart data files do not contain the name of the hotspot from which the data was generated, the script expects that information to be present in the file name. Properly named files will begin with the name of the hotspot, followed by an underscore, like so:
 
     >Brooklyn Bridge Park_L1902982__...
-
-- **eBird Taxonomy** - The script sorts observation data according to the eBird taxonomy. In order for it to do so, you will need a local copy. It is available for download [here.](https://www.birds.cornell.edu/clementschecklist/download/?__hstc=60209138.7dc66638a76ffe663330f5113d61277b.1598220823146.1598928394012.1599442334159.5&__hssc=60209138.1.1599442334159&__hsfp=2418166864) **Note:** This cannot be in the same folder as the bar chart data.
 
 ### Step 2 - Configure Script
 

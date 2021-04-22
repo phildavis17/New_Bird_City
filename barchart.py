@@ -1,3 +1,7 @@
+"""
+Barchart objects are used to hold barcart data from eBird. Summary objects hold data summarizing their parent barcarts for a specific period.
+"""
+
 import calendar
 import csv
 import json
@@ -16,7 +20,7 @@ class Barchart:
     PERIODS = tuple(range(48))
 
     def __init__(self) -> None:
-        self.timestamp = fm.TimeKeeper.get_timestamp()
+        self.timestamp = fm.TimeKeeper.generate_timestamp()
         self.loc_id = ""
         self.samp_sizes = []
         self.observations = {}
@@ -67,23 +71,27 @@ class Barchart:
         """
         return csv_path.stem.split("_")[1]
 
-    @classmethod
-    def new_from_json(cls, json_path: Path):
-        # TODO: Core
-        pass
+    @staticmethod
+    def new_from_json(json_path: Path):
+        """Returns a new Barchart object with data from a supplied JSON file."""
+        new_barchart = Barchart()
+        new_barchart.ingest_json(json_path)
+        return new_barchart
 
-    def ingest_json(self, json_path: Path):
-        # TODO: Core
-        in_dict = json.load(json_path)
+    def ingest_json(self, json_path: Path) -> None:
+        """Reads the data from a JSON file, and populates a Barchart with it."""
+        json_string = self._read_json_file(json_path)
+        in_dict = json.loads(json_string)
         self.loc_id = in_dict["loc_id"]
         self.timestamp = in_dict["timestamp"]
         self.samp_sizes = in_dict["samp_sizes"]
         self.observations = in_dict["observations"]
 
     @staticmethod
-    def read_json_file(json_path: Path):
-        # TODO: Core
-        pass
+    def _read_json_file(json_path: Path) -> str:
+        with open(json_path, "r") as in_file:
+            json_string = json.load(in_file)
+        return json_string
 
     def _to_json_string(self) -> str:
         """Creates a json compatable string representation of this Barchart object."""
@@ -144,7 +152,7 @@ class Barchart:
     @staticmethod
     def clean_sp_name(sp_name: str) -> str:
         """Removes scientific name from species name cell if present."""
-        # At time of writing, scientific names are all preceded by a space and an open peren.
+        # At time of writing, scientific names are all preceded by " (<".
         # If eBird changes this, this method will break.
         end_index = sp_name.find(" (<")
         if end_index == -1:
@@ -175,6 +183,10 @@ class Barchart:
         return round(total_num_present / sum(samp_sizes), 5)
 
     def get_observation(self, sp_name: str, index: int) -> float:
+        """
+        Returns the obervation of a supplied species for a supplied column number.
+        Provides a more readable alternative to directly accessing the data.
+        """
         return self.observations[sp_name][index]
 
     def _collect_period_samp_sizes(self, period: int) -> list:
@@ -196,6 +208,7 @@ class Barchart:
         return obs_dict
 
     def summarize_period(self, period: int) -> dict:
+        """Calculates amd returms the occurance rate of each species over a provided period as a dict."""
         samps = self._collect_period_samp_sizes(period)
         obs_dict = self._collect_period_observations(period)
         summary_dict = {}
@@ -205,7 +218,7 @@ class Barchart:
                 summary_dict[sp] = s
         return summary_dict
 
-    def new_period_summary(self, period: int):
+    def new_period_summary(self, period: int) -> "Summary":
         """Returns a new Summary object with data for the specified period."""
         summ = Summary()
         summ.loc_id = self.loc_id
@@ -214,13 +227,15 @@ class Barchart:
         summ.observations = self.summarize_period(period)
         return summ
 
-    def stash_json(self):
+    def stash_json(self) -> None:
+        """Builds a filename and calls FileManager.stash_json."""
         filename = fm.FileNameMaker.make_filename(self)
-        fm.FileManager.stash_barcart_json(filename, self._to_json_string())
+        fm.FileManager.stash_json(filename, self._to_json_string())
 
     def summarize_and_stash_all_periods(self) -> None:
-        # TODO: Core
-        pass
+        for p in self.PERIODS:
+            summ = self.new_period_summary(p)
+            summ.stash_json()
 
     def __repr__(self) -> str:
         return f"<Barchart object at {hex(id(self))}>"
@@ -242,8 +257,8 @@ class Summary:
     def __len__(self) -> int:
         return len(self.observations)
 
-    # def get_species(self) -> list:
-    #    return self.observations.keys()
+    def get_species(self) -> list:
+        return self.observations.keys()
 
     def to_json_string(self) -> str:
         """Returns a json compatable string representation of this Summary."""
@@ -257,7 +272,7 @@ class Summary:
     def stash_json(self) -> None:
         json_str = self.to_json_string()
         filename = fm.FileNameMaker.make_filename(self)
-        fm.FileManager.stash_summary_json(filename, json_str)
+        fm.FileManager.stash_json(filename, json_str)
 
     @classmethod
     def new_from_json(cls):
@@ -281,10 +296,18 @@ if __name__ == "__main__":
         / "ebird_L109516__1900_2021_1_12_barchart.txt"
     )
 
-    bc = Barchart.new_from_csv(TEST_FILE)
-    bc2 = Barchart.new_from_csv(TEST_FILE_2)
+    TEST_JSON_FILE_2 = (
+        Path(__file__).parent / "data" / "barcharts" / "barchart_L109516_20210421.json"
+    )
+
+    # bc = Barchart.new_from_csv(TEST_FILE)
+    # bc2 = Barchart.new_from_csv(TEST_FILE_2)
+    bc_json = Barchart.new_from_json(TEST_JSON_FILE_2)
     # print(type(bc._to_json_string()))
     # bc.stash_json()
     # bc2.stash_json()
-
-    print(bc.__class__.__name__.lower() == "Barchart".lower())
+    # print(bc_csv.observations == bc_json.observations)
+    # print(bc_csv.loc_id == bc_json.loc_id)
+    # print(bc_csv.timestamp == bc_json.timestamp)
+    # print(bc_csv.samp_sizes == bc_json.samp_sizes)
+    bc_json.summarize_and_stash_all_periods()
