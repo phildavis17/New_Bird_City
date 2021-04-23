@@ -5,8 +5,10 @@ Barchart objects are used to hold barcart data from eBird. Summary objects hold 
 import calendar
 import csv
 import json
+import logging
 import math
 import file_manager as fm  # Aliased to prevent circular import
+import eBird_interface as eb
 
 from pathlib import Path
 
@@ -22,6 +24,7 @@ class Barchart:
     def __init__(self) -> None:
         self.timestamp = fm.TimeKeeper.generate_timestamp()
         self.loc_id = ""
+        self.name = ""
         self.samp_sizes = []
         self.observations = {}
 
@@ -43,6 +46,16 @@ class Barchart:
         self.loc_id = self.loc_id_from_ebird_barchart(csv_path)
         self.samp_sizes = samps
         self.observations = obs
+        self._get_name()
+
+    def _get_name(self):
+        """Gives itself a Name attribute."""
+        if not self.loc_id:
+            raise ValueError("Name requested with no loc_id value")
+        if hasattr(self, "name") and self.name:
+            logging.info("Barchart object already has name.")
+            return
+        self.name = eb.eBirdInterface.get_hotspot_name(self.loc_id)
 
     @staticmethod
     def _read_csv_file(csv_path: Path) -> list:
@@ -67,7 +80,7 @@ class Barchart:
     def loc_id_from_ebird_barchart(csv_path: Path) -> str:
         """
         Returns the location ID of a hotspot from an eBird bar chart file name. Assumes file has not been renamed.
-        Differes from similar method in FileManager, as it deals with eBird files, not files named by this app.
+        Differs from similar method in FileManager, as it deals with eBird files, not files named by this app.
         """
         return csv_path.stem.split("_")[1]
 
