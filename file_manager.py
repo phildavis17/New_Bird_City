@@ -352,3 +352,11 @@ class FileNameMaker:
     def hs_bv_from_filename(cls, filename) -> str:
         """Returns the loc_id from a supplied filename."""
         return cls._part_from_filename(filename, "hs_bv")
+
+
+class Reporter:
+    _THRESHOLD_HIGH = 0.99
+    _THRESHOLD_LOW = 0.01
+
+    def __init__(self) -> None:
+        pass
