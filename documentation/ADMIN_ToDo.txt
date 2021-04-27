@@ -1,0 +1,15 @@
+Missing Features
+
+Analysis
+ - New
+
+Reporter
+ - format observations
+ - sort observations
+ -- Alpha
+ -- Taxo
+ -- Overall Likelihood
+
+Trip
+
+Simulator
