@@ -315,7 +315,7 @@ if __name__ == "__main__":
 
     # bc = Barchart.new_from_csv(TEST_FILE)
     # bc2 = Barchart.new_from_csv(TEST_FILE_2)
-    bc_json = Barchart.new_from_json(TEST_JSON_FILE_2)
+    # bc_json = Barchart.new_from_json(TEST_JSON_FILE_2)
     # print(type(bc._to_json_string()))
     # bc.stash_json()
     # bc2.stash_json()
@@ -323,4 +323,7 @@ if __name__ == "__main__":
     # print(bc_csv.loc_id == bc_json.loc_id)
     # print(bc_csv.timestamp == bc_json.timestamp)
     # print(bc_csv.samp_sizes == bc_json.samp_sizes)
-    bc_json.summarize_and_stash_all_periods()
+    # bc_json.summarize_and_stash_all_periods()
+
+    for i in range(49):
+        print(Barchart.humanize_date_range(i))
