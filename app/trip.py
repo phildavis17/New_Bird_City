@@ -162,9 +162,6 @@ class Trip:
             comparison[bird] = round(self.birds[bird] - alt_trip.birds[bird], 5)
         return comparison
 
-    def compare_verbose(self, alt_trip):
-        pass
-
     def sort_val(self):
         """Returns the trip dict sorted by liklihood value."""
         sorted_dict = {}

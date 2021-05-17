@@ -5,7 +5,7 @@ import barchart as dt
 
 from datetime import date
 from pathlib import Path
-from typing import Union
+from typing import Optional, Union
 
 # from analysis import Analysis, Trip
 # from barchart import Barchart, Summary
@@ -96,6 +96,22 @@ class FileManager:
             logging.info("Existing good file found. No file written.")
             return
         cls._write_json(folder, filename, json_string)
+
+    @classmethod
+    def request_best_file(cls, file_type: str, match_dict: dict) -> Optional[Path]:
+        """
+        Attempts to return the most best available file for the supplied criteria.
+        Returns None if no suitable file is found.
+        """
+        if file_type not in cls.DATA_FOLDERS:
+            raise ValueError(f"Improper file type supplied: {file_type}")
+        folder = cls.DATA_FOLDERS[file_type]
+        matching_files = cls._request_colliding_files(folder, match_dict)
+        if not matching_files:
+            return None
+        if len(matching_files) == 1:
+            return matching_files[0]
+        return cls._pick_most_recent_file(matching_files)
 
 
 class TimeKeeper:
