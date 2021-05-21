@@ -1,7 +1,5 @@
 import csv
 import json
-from taxonomy_reader import CATEGORY_COL
-from taxonomy_builder import COMMON_NAME_COL
 import requests
 import time
 
