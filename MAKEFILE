@@ -1,0 +1,3 @@
+rebuild:
+	rm test.db
+	python static_db_setup.py
