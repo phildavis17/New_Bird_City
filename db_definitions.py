@@ -5,7 +5,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.sql.expression import null
 from sqlalchemy.sql.sqltypes import Boolean, Float, TIMESTAMP
 
-engine = create_engine("sqlite:///data/test.db")
+# engine = create_engine("sqlite:///data/test.db")
 
 Base = declarative_base()
 
@@ -69,5 +69,5 @@ class SeenBird(Base):
     SpIndex = Column(Integer, ForeignKey(Species.SpIndex))
 
 
-Base.metadata.create_all(engine)
-Base.metadata.bind = engine
+# Base.metadata.create_all(engine)
+# Base.metadata.bind = engine
