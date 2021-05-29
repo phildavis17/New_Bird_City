@@ -193,6 +193,8 @@ class Barchart:
         data = zip(samp_sizes, obs)
         for pair in data:
             total_num_present += round(pair[0] * pair[1])
+        if sum(samp_sizes) == 0:
+            return 0.0
         return round(total_num_present / sum(samp_sizes), 5)
 
     def get_observation(self, sp_name: str, index: int) -> float:
@@ -314,7 +316,14 @@ if __name__ == "__main__":
     )
 
     # bc = Barchart.new_from_csv(TEST_FILE)
-    # bc2 = Barchart.new_from_csv(TEST_FILE_2)
+    bc2 = Barchart.new_from_csv(TEST_FILE_2)
+    # for p in range(48):
+    #    summ_dict = bc2.summarize_period(p)
+    #    if summ_dict.get("Yellow-throated Warbler") == 0.00347:
+    #        print(p)
+
+    print(bc2.summarize_period(17))
+
     # bc_json = Barchart.new_from_json(TEST_JSON_FILE_2)
     # print(type(bc._to_json_string()))
     # bc.stash_json()
@@ -325,5 +334,5 @@ if __name__ == "__main__":
     # print(bc_csv.samp_sizes == bc_json.samp_sizes)
     # bc_json.summarize_and_stash_all_periods()
 
-    for i in range(49):
-        print(Barchart.humanize_date_range(i))
+    # for i in range(49):
+    #    print(Barchart.humanize_date_range(i))

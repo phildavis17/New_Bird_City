@@ -17,18 +17,27 @@ class Species(Base):
     CommonName = Column(String(100), nullable=False)
     SciName = Column(String(100), nullable=False)
 
+    def __repr__(self) -> str:
+        return f"Species(Index = {self.SpIndex}, Name = {self.CommonName})"
 
-class Hotstpot(Base):
+
+class Hotspot(Base):
     __tablename__ = "Hotspots"
     LocId = Column(String(10), primary_key=True)
     Name = Column(String(100), nullable=False)
     Timestamp = Column(Float, nullable=False)
+
+    def __repr__(self) -> str:
+        return f"Hotspot(LocId = {self.LocId}, Name = {self.Name})"
 
 
 class Period(Base):
     __tablename__ = "Periods"
     PeriodId = Column(Integer, primary_key=True)
     Description = Column(String(32), nullable=False)
+
+    def __repr__(self) -> str:
+        return f"Period(Id = {self.PeriodId}, Description = {self.Description})"
 
 
 class User(Base):
@@ -40,10 +49,13 @@ class User(Base):
 
 class Observation(Base):
     __tablename__ = "Observations"
-    LocId = Column(String(10), ForeignKey(Hotstpot.LocId), primary_key=True)
+    LocId = Column(String(10), ForeignKey(Hotspot.LocId), primary_key=True)
     PeriodId = Column(Integer, ForeignKey(Period.PeriodId), primary_key=True)
     SpIndex = Column(Integer, ForeignKey(Species.SpIndex), primary_key=True)
     Obs = Column(Float, nullable=False)
+
+    def __repr__(self):
+        return f"Observation(loc_id = {self.LocId}, period = {self.PeriodId}, sp_index = {self.SpIndex}, obs = {self.Obs})"
 
 
 class Analysis(Base):
@@ -58,7 +70,7 @@ class HotspotConfig(Base):
     __tablename__ = "HotspotConfigs"
     UserId = Column(Integer, ForeignKey(User.UserId), primary_key=True)
     AnalysisId = Column(Integer, ForeignKey(Analysis.AnalysisId), primary_key=True)
-    LocId = Column(String(10), ForeignKey(Hotstpot.LocId))
+    LocId = Column(String(10), ForeignKey(Hotspot.LocId))
     IsActive = Column(Integer, nullable=False)
 
 
