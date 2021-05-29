@@ -46,7 +46,7 @@ class Analysis:
         for chart in barcharts:
             pass
         
-
+    def new_from_db(loc_ids: list, period: int, name: str, )
 
     # get best file for locID
     # make a new barchart from it
