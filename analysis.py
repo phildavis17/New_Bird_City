@@ -16,7 +16,6 @@ class Analysis:
         self.observations = self._build_obs_dict(self.hotspots, self.period)
         self.master_sp_list = []
 
-
     def _build_obs_dict(loc_ids: list, period: int) -> dict:
         pass
 
@@ -30,7 +29,7 @@ class Analysis:
     def _build_summaries(loc_ids: list, period: int) -> list:
         out_dict = {}
         paths = []
-        
+
         for loc_id in loc_ids:
             new_file = fm.FileManager.request_best_file("barchart", {"loc_id": loc_id})
             if not new_file:
@@ -41,12 +40,13 @@ class Analysis:
         barcharts = []
         for file_path in paths:
             barcharts.append(bc.Barchart.new_from_json(file_path))
-            
+
         obs_dicts = {}
         for chart in barcharts:
             pass
-        
-    def new_from_db(loc_ids: list, period: int, name: str, )
+
+    def new_from_db(loc_ids: list, period: int, name: str, user: str):
+        pass
 
     # get best file for locID
     # make a new barchart from it
@@ -62,7 +62,7 @@ class Analysis:
         obs_dict.update(in_summary.observations)
         out_dict = {in_loc: obs_dict}
         return out_dict
-    
+
     def _ingest_summary(self, in_summary: "Summary") -> dict:
         pass
 
