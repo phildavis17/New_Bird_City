@@ -9,6 +9,10 @@ from sqlalchemy.sql.sqltypes import Boolean, Float, TIMESTAMP
 
 Base = declarative_base()
 
+Session = sessionmaker()
+Session.configure(bind=engine)
+session = Session()
+
 
 class Species(Base):
     __tablename__ = "Species"
@@ -79,6 +83,20 @@ class SeenBird(Base):
     UserId = Column(Integer, ForeignKey(User.UserId), primary_key=True)
     AnalysisId = Column(Integer, ForeignKey(Analysis.AnalysisId), primary_key=True)
     SpIndex = Column(Integer, ForeignKey(Species.SpIndex))
+
+
+class DBInterface:
+    def __init__(self) -> None:
+        pass
+
+    def sp_name_from_index(sp_index: int) -> str:
+        pass
+
+    def hs_name_from_loc_id(loc_id: str) -> str:
+        pass
+
+    def collect_observations(loc_id: str, period: int) -> dict:
+        pass
 
 
 # Base.metadata.create_all(engine)

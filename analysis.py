@@ -6,7 +6,45 @@ import eBird_interface as eb
 from collections import defaultdict
 
 
+from sqlalchemy import create_engine
+from sqlalchemy.orm import Session, sessionmaker
+from db_definitions import Observation, Species, Hotspot, Period, DBInterface
+
+ENGINE = create_engine("sqlite:///data/vagrant_db.db")
+# Session = sessionmaker()
+# Session.configure(bind=engine)
+# this_session = Session()
+
+
+def sp_name_from_index(session: Session, sp_index: int) -> str:
+    q = session.query(Species).filter(Species.SpIndex == sp_index).limit(1)
+    return q.first().CommonName
+
+
+def obs_dict_from_db(session: Session, loc_id: str, period: int) -> dict:
+    obs_dict = {}
+    q = (
+        session.query(Observation)
+        .filter(Observation.LocId == loc_id)
+        .filter(Observation.PeriodId == period)
+        .order_by(Observation.SpIndex)
+    )
+    for obs in q:
+        obs_dict[sp_name_from_index(session, obs.SpIndex)] = obs.Obs
+    return obs_dict
+
+
+def hs_name_from_loc_id(session: Session, loc_id: str) -> str:
+    q = session.query(Hotspot).filter(Hotspot.LocId == loc_id).limit(1)
+    return q.first().Name
+
+
 class Analysis:
+    # WHAT AM I DOING????
+    # Build Analysis
+    # Modify BV
+    # Sort Obs by
+
     def __init__(self, loc_ids: list, period: int, name: str) -> None:
         self.title = name
         self.period = period
@@ -27,25 +65,6 @@ class Analysis:
         return hs_name_dict
 
     def _build_summaries(loc_ids: list, period: int) -> list:
-        out_dict = {}
-        paths = []
-
-        for loc_id in loc_ids:
-            new_file = fm.FileManager.request_best_file("barchart", {"loc_id": loc_id})
-            if not new_file:
-                raise ValueError(
-                    f"No suitable file could be found for loc_id: {loc_id}"
-                )
-            paths.append(new_file)
-        barcharts = []
-        for file_path in paths:
-            barcharts.append(bc.Barchart.new_from_json(file_path))
-
-        obs_dicts = {}
-        for chart in barcharts:
-            pass
-
-    def new_from_db(loc_ids: list, period: int, name: str, user: str):
         pass
 
     # get best file for locID
@@ -63,22 +82,13 @@ class Analysis:
         out_dict = {in_loc: obs_dict}
         return out_dict
 
-    def _ingest_summary(self, in_summary: "Summary") -> dict:
-        pass
-
     @staticmethod
     def _bv_to_bools(bv: str) -> list:
-        out_bools = []
-        for c in bv:
-            out_bools.append(c == "1")
-        return out_bools
+        return [c == "1" for c in bv]
 
     #  Builtins
     def __len__(self):
         return len(self.hotspots)
-
-    def __eq__(self, other):
-        pass
 
     def __repr__(self):
         pass
@@ -92,3 +102,10 @@ class Trip:
         self.hotspots = None
         self.observations = {}
         self.specialties = {}
+
+
+PROSPECT_PARK = "L109516"
+
+if __name__ == "__main__":
+    print(hs_name_from_loc_id(PROSPECT_PARK))
+    print(obs_dict_from_db(PROSPECT_PARK, 1))
