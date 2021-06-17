@@ -2,6 +2,7 @@ from pathlib import Path
 import barchart as bc
 import file_manager as fm
 import eBird_interface as eb
+import uuid
 
 from collections import defaultdict
 
@@ -46,6 +47,13 @@ class Analysis:
     # Sort Obs by
 
     def __init__(self, loc_ids: list, period: int, name: str) -> None:
+        # is there already a
+
+        self.UserId = None
+        self.AnalysisId = uuid.uuid4()
+        self.AnalysisName = None
+        self.period = None
+
         self.title = name
         self.period = period
         self.hotspot_ids = tuple(sorted(loc_ids))
@@ -54,15 +62,12 @@ class Analysis:
         self.observations = self._build_obs_dict(self.hotspots, self.period)
         self.master_sp_list = []
 
-    def _build_obs_dict(loc_ids: list, period: int) -> dict:
-        pass
-
-    def _get_hotspot_names(loc_ids: tuple) -> dict:
-        """Returns a dict with supplied loc_ids as keys and matching hotspot names as values."""
-        hs_name_dict = {}
-        for loc_id in loc_ids:
-            hs_name_dict[loc_id] = eb.eBirdInterface.get_hotspot_name(loc_id)
-        return hs_name_dict
+    #    def _get_hotspot_names(loc_ids: tuple) -> dict:
+    #        """Returns a dict with supplied loc_ids as keys and matching hotspot names as values."""
+    #        hs_name_dict = {}
+    #        for loc_id in loc_ids:
+    #            hs_name_dict[loc_id] = eb.eBirdInterface.get_hotspot_name(loc_id)
+    #        return hs_name_dict
 
     def _build_summaries(loc_ids: list, period: int) -> list:
         pass
