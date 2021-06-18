@@ -12,9 +12,8 @@ from sqlalchemy.orm import Session, sessionmaker
 from db_definitions import Observation, Species, Hotspot, Period, DBInterface
 
 ENGINE = create_engine("sqlite:///data/vagrant_db.db")
-# Session = sessionmaker()
-# Session.configure(bind=engine)
-# this_session = Session()
+Session = sessionmaker()
+Session.configure(bind=ENGINE)
 
 
 def sp_name_from_index(session: Session, sp_index: int) -> str:
@@ -47,45 +46,35 @@ class Analysis:
     # Sort Obs by
 
     def __init__(self, loc_ids: list, period: int, name: str) -> None:
-        # is there already a
-
-        self.UserId = None
-        self.AnalysisId = uuid.uuid4()
-        self.AnalysisName = None
-        self.period = None
-
-        self.title = name
-        self.period = period
         self.hotspot_ids = tuple(sorted(loc_ids))
-        self.hotspot_names = self._get_hotspot_names(self.hotspot_ids)
+        self.user_id = "DEMO_USER_001"
+        self.analysis_id = uuid.uuid4()
+        self.name = name
+        self.period = period
+        with Session() as init_session:
+            self.observations = {
+                loc_id: obs_dict_from_db(init_session, loc_id, period)
+                for loc_id in loc_ids
+            }
+            self.hotspot_names = tuple(
+                [
+                    hs_name_from_loc_id(init_session, loc_id)
+                    for loc_id in self.hotspot_ids
+                ]
+            )
+
         self.hs_bv = "1" * len(loc_ids)
-        self.observations = self._build_obs_dict(self.hotspots, self.period)
         self.master_sp_list = []
-
-    #    def _get_hotspot_names(loc_ids: tuple) -> dict:
-    #        """Returns a dict with supplied loc_ids as keys and matching hotspot names as values."""
-    #        hs_name_dict = {}
-    #        for loc_id in loc_ids:
-    #            hs_name_dict[loc_id] = eb.eBirdInterface.get_hotspot_name(loc_id)
-    #        return hs_name_dict
-
-    def _build_summaries(loc_ids: list, period: int) -> list:
-        pass
-
-    # get best file for locID
-    # make a new barchart from it
-    # get a period summary dict from that Barchart
-    # ingest the period summary dict
-    # ingest summary
 
     def trip_from_bv(self, bv: str) -> "Trip":
         pass
 
-    def _ingest_obs_dict(self, in_dict: dict) -> dict:
-        obs_dict = defaultdict(float)
-        obs_dict.update(in_summary.observations)
-        out_dict = {in_loc: obs_dict}
-        return out_dict
+    def build_master_sp_list(session: Session, obs_dict: dict) -> list:
+        sp_set = set()
+        for d in obs_dict.values():
+            sp_set.update(d.keys())
+        #! This seems funky!
+        indicies = [(sp, session.query(Species).filter(Species.CommonName))]
 
     @staticmethod
     def _bv_to_bools(bv: str) -> list:
@@ -112,5 +101,7 @@ class Trip:
 PROSPECT_PARK = "L109516"
 
 if __name__ == "__main__":
-    print(hs_name_from_loc_id(PROSPECT_PARK))
-    print(obs_dict_from_db(PROSPECT_PARK, 1))
+
+    with Session() as this_session:
+        print(hs_name_from_loc_id(this_session, PROSPECT_PARK))
+        print(obs_dict_from_db(this_session, PROSPECT_PARK, 1))
