@@ -21,6 +21,11 @@ def sp_name_from_index(session: Session, sp_index: int) -> str:
     return q.first().CommonName
 
 
+def sp_index_from_name(session: Session, sp_name: str) -> int:
+    q = session.query(Species).filter(Species.CommonName == sp_name).limit(1)
+    return q.first().SpIndex
+
+
 def obs_dict_from_db(session: Session, loc_id: str, period: int) -> dict:
     obs_dict = {}
     q = (
@@ -51,6 +56,7 @@ class Analysis:
         self.analysis_id = uuid.uuid4()
         self.name = name
         self.period = period
+        self.hs_bv = "1" * len(loc_ids)
         with Session() as init_session:
             self.observations = {
                 loc_id: obs_dict_from_db(init_session, loc_id, period)
@@ -62,19 +68,22 @@ class Analysis:
                     for loc_id in self.hotspot_ids
                 ]
             )
-
-        self.hs_bv = "1" * len(loc_ids)
-        self.master_sp_list = []
+            self.sp_list = self.build_master_sp_list(init_session, self.observations)
 
     def trip_from_bv(self, bv: str) -> "Trip":
         pass
 
+    @staticmethod
     def build_master_sp_list(session: Session, obs_dict: dict) -> list:
+        """Returns a list of unique species in the all the hotspots in the Analysis in taxonomic order."""
         sp_set = set()
         for d in obs_dict.values():
             sp_set.update(d.keys())
-        #! This seems funky!
-        indicies = [(sp, session.query(Species).filter(Species.CommonName))]
+        indicies = list(sp_set)
+        indicies.sort(key=lambda sp: sp_index_from_name(session, sp))
+        return indicies
+        # indecies = [(sp, sp_index_from_name(session, sp)) for sp in sp_set]
+        # indecies.sort(key=)
 
     @staticmethod
     def _bv_to_bools(bv: str) -> list:
@@ -82,7 +91,7 @@ class Analysis:
 
     #  Builtins
     def __len__(self):
-        return len(self.hotspots)
+        return len(self.hotspot_ids)
 
     def __repr__(self):
         pass
@@ -102,6 +111,10 @@ PROSPECT_PARK = "L109516"
 
 if __name__ == "__main__":
 
-    with Session() as this_session:
-        print(hs_name_from_loc_id(this_session, PROSPECT_PARK))
-        print(obs_dict_from_db(this_session, PROSPECT_PARK, 1))
+    # with Session() as this_session:
+    #    print(hs_name_from_loc_id(this_session, PROSPECT_PARK))
+    #    print(obs_dict_from_db(this_session, PROSPECT_PARK, 1))
+    #    print(sp_index_from_name(this_session, "Common Ostrich"))
+
+    test1 = Analysis([PROSPECT_PARK], 1, "test analysis")
+    print(test1.observations)
