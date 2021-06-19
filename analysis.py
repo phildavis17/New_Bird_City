@@ -59,7 +59,9 @@ class Analysis:
         self.hs_bv = "1" * len(loc_ids)
         with Session() as init_session:
             self.observations = {
-                loc_id: obs_dict_from_db(init_session, loc_id, period)
+                loc_id: defaultdict(
+                    float, obs_dict_from_db(init_session, loc_id, period)
+                )
                 for loc_id in loc_ids
             }
             self.hotspot_names = tuple(
@@ -72,6 +74,9 @@ class Analysis:
 
     def trip_from_bv(self, bv: str) -> "Trip":
         pass
+
+    def get_sp_obs(self, sp_name: str) -> dict:
+        return {hs: self.observations[hs][sp_name] for hs in self.hotspot_ids}
 
     @staticmethod
     def build_master_sp_list(session: Session, obs_dict: dict) -> list:
@@ -94,7 +99,7 @@ class Analysis:
         return len(self.hotspot_ids)
 
     def __repr__(self):
-        pass
+        return f"Analysis Object '{self.name}' with {len(self)} hotspots."
 
 
 class Trip:
@@ -116,5 +121,18 @@ if __name__ == "__main__":
     #    print(obs_dict_from_db(this_session, PROSPECT_PARK, 1))
     #    print(sp_index_from_name(this_session, "Common Ostrich"))
 
-    test1 = Analysis([PROSPECT_PARK], 1, "test analysis")
-    print(test1.observations)
+    BKHS = [
+        "L109145",
+        "L109516",
+        "L152773",
+        "L285884",
+        "L351189",
+        "L385839",
+        "L444485",
+    ]
+    bk = Analysis(BKHS, 17, "Brooklyn, baby")
+    print(bk)
+    for park, obs in bk.observations.items():
+        print(park)
+        print(obs)
+    print(bk.get_sp_obs("Indigo Bunting"))
