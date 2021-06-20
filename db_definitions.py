@@ -46,7 +46,7 @@ class Period(Base):
 
 class User(Base):
     __tablename__ = "Users"
-    UserId = Column(Integer, primary_key=True)
+    UserId = Column(String(40), primary_key=True)
     Email = Column(String(100), nullable=False)
     LoginCount = Column(Integer)
 
@@ -64,25 +64,25 @@ class Observation(Base):
 
 class AnalysisConfig(Base):
     __tablename__ = "Analyses"
-    UserId = Column(Integer, ForeignKey(User.UserId), primary_key=True)
-    AnalysisId = Column(Integer, nullable=False, primary_key=True)
+    UserId = Column(String(40), ForeignKey(User.UserId), primary_key=True)
+    AnalysisId = Column(String(100), nullable=False, primary_key=True)
     AnalysisName = Column(String(100))
     PeriodId = Column(Integer, ForeignKey(Period.PeriodId))
 
 
 class HotspotConfig(Base):
     __tablename__ = "HotspotConfigs"
-    UserId = Column(Integer, ForeignKey(User.UserId), primary_key=True)
+    UserId = Column(String(40), ForeignKey(User.UserId), primary_key=True)
     AnalysisId = Column(
         Integer, ForeignKey(AnalysisConfig.AnalysisId), primary_key=True
     )
-    LocId = Column(String(10), ForeignKey(Hotspot.LocId))
+    LocId = Column(String(10), ForeignKey(Hotspot.LocId), primary_key=True)
     IsActive = Column(Integer, nullable=False)
 
 
 class SeenBird(Base):
     __tablename__ = "SeenBirds"
-    UserId = Column(Integer, ForeignKey(User.UserId), primary_key=True)
+    UserId = Column(String(40), ForeignKey(User.UserId), primary_key=True)
     AnalysisId = Column(
         Integer, ForeignKey(AnalysisConfig.AnalysisId), primary_key=True
     )
