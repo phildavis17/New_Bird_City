@@ -187,7 +187,7 @@ DEMO_ANALYSES = [
 
 for a in DEMO_ANALYSES:
     locs, p, name = a
-    a_id = uuid4()
+    a_id = str(uuid4())
     u_id = "Demo_User_001"
     this_a_config = AnalysisConfig()
     this_a_config.UserId = u_id
@@ -204,6 +204,3 @@ for a in DEMO_ANALYSES:
         session.add(this_hs_config)
 session.commit()
 logging.info("Demo finished!")
-
-
-session.commit()
