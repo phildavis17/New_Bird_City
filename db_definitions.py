@@ -62,7 +62,7 @@ class Observation(Base):
         return f"Observation(loc_id = {self.LocId}, period = {self.PeriodId}, sp_index = {self.SpIndex}, obs = {self.Obs})"
 
 
-class Analysis(Base):
+class AnalysisConfig(Base):
     __tablename__ = "Analyses"
     UserId = Column(Integer, ForeignKey(User.UserId), primary_key=True)
     AnalysisId = Column(Integer, nullable=False, primary_key=True)
@@ -73,7 +73,9 @@ class Analysis(Base):
 class HotspotConfig(Base):
     __tablename__ = "HotspotConfigs"
     UserId = Column(Integer, ForeignKey(User.UserId), primary_key=True)
-    AnalysisId = Column(Integer, ForeignKey(Analysis.AnalysisId), primary_key=True)
+    AnalysisId = Column(
+        Integer, ForeignKey(AnalysisConfig.AnalysisId), primary_key=True
+    )
     LocId = Column(String(10), ForeignKey(Hotspot.LocId))
     IsActive = Column(Integer, nullable=False)
 
@@ -81,7 +83,9 @@ class HotspotConfig(Base):
 class SeenBird(Base):
     __tablename__ = "SeenBirds"
     UserId = Column(Integer, ForeignKey(User.UserId), primary_key=True)
-    AnalysisId = Column(Integer, ForeignKey(Analysis.AnalysisId), primary_key=True)
+    AnalysisId = Column(
+        Integer, ForeignKey(AnalysisConfig.AnalysisId), primary_key=True
+    )
     SpIndex = Column(Integer, ForeignKey(Species.SpIndex))
 
 
