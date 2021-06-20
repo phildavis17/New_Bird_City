@@ -14,7 +14,18 @@ import logging
 from pathlib import Path
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-from db_definitions import Base, Observation, Species, Hotspot, Period
+from uuid import uuid4
+from analysis import Analysis
+from db_definitions import (
+    Base,
+    Observation,
+    Species,
+    Hotspot,
+    Period,
+    User,
+    AnalysisConfig,
+    HotspotConfig,
+)
 
 DB_PATH = Path(__file__).parent / "data" / "vagrant_db.db"
 assert not DB_PATH.exists()
@@ -102,3 +113,97 @@ for f in eBird_files:
     session.commit()
     logging.info("%s done.", bar.name)
 logging.info("Observations done!")
+
+# Demo User
+logging.info("User start")
+demo_user = User()
+demo_user.UserId = "Demo_User_001"
+demo_user.Email = "***REMOVED***@gmail.com"
+demo_user.LoginCount = 0
+session.add(demo_user)
+session.commit()
+logging.info("User done!")
+
+# Demo Analysis
+logging.info("Demo Start")
+
+BROOKLYN = [
+    "L109145",
+    "L109516",
+    "L152773",
+    "L285884",
+    "L351189",
+    "L385839",
+    "L444485",
+]
+
+AUSTIN = [
+    "L129127",
+    "L270815",
+    "L302109",
+    "L436433",
+    "L567534",
+]
+
+BERMUDA = [
+    "L952649",
+    "L2339599",
+    "L2709029",
+    "L2709162",
+    "L2714552",
+    "L2714557",
+]
+
+PHILADELPHIA = [
+    "L160720",
+    "L504403",
+    "L1025768",
+    "L1145863",
+]
+
+SEATTLE = [
+    "L128138",
+    "L128530",
+    "L162766",
+    "L165740",
+    "L7497115",
+]
+
+SYDNEY = [
+    "L915566",
+    "L945869",
+    "L958321",
+    "L2444301",
+]
+
+DEMO_ANALYSES = [
+    (BROOKLYN, 18, "Demo - Brooklyn, May"),
+    (AUSTIN, 25, "Demo - Austin, early July"),
+    (BERMUDA, 30, "Demo - Bermuda, August"),
+    (PHILADELPHIA, 18, "Demo - Philly, May"),
+    (SEATTLE, 40, "Demo - Seattle, mid Autumn"),
+    (SYDNEY, 0, "Demo - Sydney, new years"),
+]
+
+for a in DEMO_ANALYSES:
+    locs, p, name = a
+    a_id = uuid4()
+    u_id = "Demo_User_001"
+    this_a_config = AnalysisConfig()
+    this_a_config.UserId = u_id
+    this_a_config.AnalysisId = a_id
+    this_a_config.AnalysisName = name
+    this_a_config.PeriodId = p
+    session.add(this_a_config)
+    for loc in locs:
+        this_hs_config = HotspotConfig()
+        this_hs_config.UserId = u_id
+        this_hs_config.AnalysisId = a_id
+        this_hs_config.LocId = loc
+        this_hs_config.IsActive = 1
+        session.add(this_hs_config)
+session.commit()
+logging.info("Demo finished!")
+
+
+session.commit()
