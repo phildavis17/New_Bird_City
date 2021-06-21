@@ -44,12 +44,31 @@ def hs_name_from_loc_id(session: Session, loc_id: str) -> str:
     return q.first().Name
 
 
-class Analysis:
-    # WHAT AM I DOING????
-    # Build Analysis
-    # Modify BV
-    # Sort Obs by
+def report_val(obs_val: float, precision=1) -> str:
+    """
+    Returns a the supplied Float or Int as a string followed by a '%'
+    Special values are replaced with special strings
+    """
+    SPECIAL_CONDITIONS = {
+        lambda x: x == 0: "-",
+        lambda x: x < 0.01: "<1%",
+        lambda x: x > 0.99: ">99%",
+    }
+    for cond, special_str in SPECIAL_CONDITIONS.items():
+        if cond(obs_val):
+            return special_str
+    return f"{round(obs_val * 100, precision)}%"
 
+
+def report_dict(obs_dict: dict) -> dict:
+    """
+    Returns a version of the supplied dict with numeric values replaced with strings.
+    Uses _report_val() to replace special values with special characters.
+    """
+    return {k: report_val(v) for k, v in obs_dict.items()}
+
+
+class Analysis:
     def __init__(self, loc_ids: list, period: int, name: str) -> None:
         self.hotspot_ids = tuple(sorted(loc_ids))
         self.user_id = "DEMO_USER_001"
@@ -87,8 +106,6 @@ class Analysis:
         indicies = list(sp_set)
         indicies.sort(key=lambda sp: sp_index_from_name(session, sp))
         return indicies
-        # indecies = [(sp, sp_index_from_name(session, sp)) for sp in sp_set]
-        # indecies.sort(key=)
 
     @staticmethod
     def _bv_to_bools(bv: str) -> list:
@@ -134,5 +151,5 @@ if __name__ == "__main__":
     print(bk)
     for park, obs in bk.observations.items():
         print(park)
-        print(obs)
-    print(bk.get_sp_obs("Indigo Bunting"))
+        print(report_dict(obs))
+    print(report_dict(bk.get_sp_obs("Indigo Bunting")))
