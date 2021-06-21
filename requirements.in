@@ -1,0 +1,7 @@
+SQLAlchemy
+Flask
+
+
+pip-tools
+ipython
+pytest
