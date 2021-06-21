@@ -6,4 +6,4 @@ scratch.py
 __pycache__
 /app/__pycache__
 ignoretest.py
-.scratch
+.scratch.py.swp
