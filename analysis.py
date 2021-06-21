@@ -60,14 +60,6 @@ def report_val(obs_val: float, precision=1) -> str:
     return f"{round(obs_val * 100, precision)}%"
 
 
-def report_dict(obs_dict: dict) -> dict:
-    """
-    Returns a version of the supplied dict with numeric values replaced with strings.
-    Uses _report_val() to replace special values with special characters.
-    """
-    return {k: report_val(v) for k, v in obs_dict.items()}
-
-
 class Analysis:
     def __init__(self, loc_ids: list, period: int, name: str) -> None:
         self.hotspot_ids = tuple(sorted(loc_ids))
@@ -75,7 +67,7 @@ class Analysis:
         self.analysis_id = uuid.uuid4()
         self.name = name
         self.period = period
-        self.hs_bv = "1" * len(loc_ids)
+        self.hs_is_active = {loc_id: True for loc_id in self.hotspot_ids}
         with Session() as init_session:
             self.observations = {
                 loc_id: defaultdict(
@@ -107,9 +99,35 @@ class Analysis:
         indicies.sort(key=lambda sp: sp_index_from_name(session, sp))
         return indicies
 
+    def build_cumulative_obs_dict(self) -> dict:
+        """
+        Calculates the cumulative observation frequency for every species in all the hotspots set to active.
+        """
+        c_dict = {}
+        for sp_name in self.sp_list:
+            obs = 1
+            for loc_id, val in self.get_sp_obs(sp_name):
+                if not self.hs_is_active[loc_id]:
+                    continue
+                val *= 1 - val
+            c_dict[sp_name] = val
+        return c_dict
+
+    @classmethod
+    def report_dict(cls, obs_dict: dict) -> dict:
+        """
+        Returns a version of the supplied dict with numeric values replaced with strings.
+        Uses _report_val() to replace special values with special characters.
+        """
+        return {k: report_val(v) for k, v in obs_dict.items()}
+
     @staticmethod
     def _bv_to_bools(bv: str) -> list:
         return [c == "1" for c in bv]
+
+    @staticmethod
+    def _bools_to_bv(bools: list) -> str:
+        return "".join([str(int(b)) for b in bools])
 
     #  Builtins
     def __len__(self):
@@ -151,5 +169,5 @@ if __name__ == "__main__":
     print(bk)
     for park, obs in bk.observations.items():
         print(park)
-        print(report_dict(obs))
-    print(report_dict(bk.get_sp_obs("Indigo Bunting")))
+        print(bk.report_dict(obs))
+    print(bk.report_dict(bk.get_sp_obs("Indigo Bunting")))
