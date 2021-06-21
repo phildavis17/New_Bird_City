@@ -106,11 +106,11 @@ class Analysis:
         c_dict = {}
         for sp_name in self.sp_list:
             obs = 1
-            for loc_id, val in self.get_sp_obs(sp_name):
+            for loc_id, val in self.get_sp_obs(sp_name).items():
                 if not self.hs_is_active[loc_id]:
                     continue
-                val *= 1 - val
-            c_dict[sp_name] = val
+                obs *= 1 - val
+            c_dict[sp_name] = round(1 - obs, 5)
         return c_dict
 
     @classmethod
@@ -167,7 +167,8 @@ if __name__ == "__main__":
     ]
     bk = Analysis(BKHS, 17, "Brooklyn, baby")
     print(bk)
-    for park, obs in bk.observations.items():
-        print(park)
-        print(bk.report_dict(obs))
-    print(bk.report_dict(bk.get_sp_obs("Indigo Bunting")))
+    # for park, obs in bk.observations.items():
+    #    print(park)
+    #    print(bk.report_dict(obs))
+    print(bk.report_dict(bk.get_sp_obs("Snow Goose")))
+    print(bk.report_dict(bk.build_cumulative_obs_dict()))
