@@ -1,6 +1,7 @@
 SQLAlchemy
 Flask
 flask-wtf
+requests
 
 
 pip-tools
