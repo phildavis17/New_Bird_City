@@ -1,4 +1,4 @@
-scratch.py
+scratch*.py
 /env
 /.vscode
 .pytest_cache/

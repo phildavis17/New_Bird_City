@@ -1,7 +1,7 @@
-from pathlib import Path
-import barchart as bc
-import file_manager as fm
-import eBird_interface as eb
+# from pathlib import Path
+# import barchart as bc
+# import file_manager as fm
+# import eBird_interface as eb
 import uuid
 
 from collections import defaultdict
@@ -9,7 +9,7 @@ from collections import defaultdict
 
 from sqlalchemy import create_engine
 from sqlalchemy.orm import Session, sessionmaker
-from db_definitions import Observation, Species, Hotspot, Period, DBInterface
+from db_definitions import Observation, Species, Hotspot, Period
 
 ENGINE = create_engine("sqlite:///data/vagrant_db.db")
 Session = sessionmaker()
@@ -17,16 +17,19 @@ Session.configure(bind=ENGINE)
 
 
 def sp_name_from_index(session: Session, sp_index: int) -> str:
+    """Returns the species name associated with the supplied species index in the databse."""
     q = session.query(Species).filter(Species.SpIndex == sp_index).limit(1)
     return q.first().CommonName
 
 
 def sp_index_from_name(session: Session, sp_name: str) -> int:
+    """Returns the species index associated with the supplied species name in the databse."""
     q = session.query(Species).filter(Species.CommonName == sp_name).limit(1)
     return q.first().SpIndex
 
 
 def obs_dict_from_db(session: Session, loc_id: str, period: int) -> dict:
+    """Returns a dict of observation data associated with the supplied loc id and period from the database."""
     obs_dict = {}
     q = (
         session.query(Observation)
@@ -40,6 +43,7 @@ def obs_dict_from_db(session: Session, loc_id: str, period: int) -> dict:
 
 
 def hs_name_from_loc_id(session: Session, loc_id: str) -> str:
+    """Returns the Hotspot name associated with the supplied loc id in the databse."""
     q = session.query(Hotspot).filter(Hotspot.LocId == loc_id).limit(1)
     return q.first().Name
 
@@ -54,8 +58,8 @@ def report_val(obs_val: float, precision=1) -> str:
         lambda x: x < 0.01: "<1%",
         lambda x: x > 0.99: ">99%",
     }
-    for cond, special_str in SPECIAL_CONDITIONS.items():
-        if cond(obs_val):
+    for condition, special_str in SPECIAL_CONDITIONS.items():
+        if condition(obs_val):
             return special_str
     return f"{round(obs_val * 100, precision)}%"
 
@@ -63,7 +67,9 @@ def report_val(obs_val: float, precision=1) -> str:
 class Analysis:
     def __init__(self, loc_ids: list, period: int, name: str) -> None:
         self.hotspot_ids = tuple(sorted(loc_ids))
-        self.user_id = "DEMO_USER_001"
+        self.user_id = (
+            "DEMO_USER_001"  # FIXME: once user functionality is added, fix this.
+        )
         self.analysis_id = uuid.uuid4()
         self.name = name
         self.period = period
@@ -81,23 +87,20 @@ class Analysis:
                     for loc_id in self.hotspot_ids
                 ]
             )
-            self.sp_list = self.build_master_sp_list(init_session, self.observations)
+            self.sp_list = self.build_master_sp_list(init_session)
 
     def trip_from_bv(self, bv: str) -> "Trip":
+        """Returns a Trip object including or excluding hotspots based on the supplied bit vector string."""
+        locs = [loc for loc, bit in zip(self.hotspot_ids, bv) if bit == "1"]
         pass
 
     def get_sp_obs(self, sp_name: str) -> dict:
         return {hs: self.observations[hs][sp_name] for hs in self.hotspot_ids}
 
-    @staticmethod
-    def build_master_sp_list(session: Session, obs_dict: dict) -> list:
+    def build_master_sp_list(self, session: Session) -> list:
         """Returns a list of unique species in the all the hotspots in the Analysis in taxonomic order."""
-        sp_set = set()
-        for d in obs_dict.values():
-            sp_set.update(d.keys())
-        indicies = list(sp_set)
-        indicies.sort(key=lambda sp: sp_index_from_name(session, sp))
-        return indicies
+        sp_list = list({key for o_dict in self.observations.values() for key in o_dict})
+        return sorted(sp_list, key=lambda sp: sp_index_from_name(session, sp))
 
     def build_cumulative_obs_dict(self) -> dict:
         """
@@ -147,9 +150,9 @@ class Trip:
         self.specialties = {}
 
 
-PROSPECT_PARK = "L109516"
-
 if __name__ == "__main__":
+
+    PROSPECT_PARK = "L109516"
 
     # with Session() as this_session:
     #    print(hs_name_from_loc_id(this_session, PROSPECT_PARK))
