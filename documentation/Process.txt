@@ -20,3 +20,22 @@ Flask-Login
 Flask-WTF (WTForms)
 Requests
 Leaflet
+ipython
+pytest
+
+
+-----FLASK FLOW------
+HOME
+ - who is this user?
+ - what analyses do they have?
+   -generate links to each Analysis
+ANALYSIS
+ - display obs data
+ - trip checkboxes
+ - sorting by...
+ - more details (trip generation)
+ - compare configurations (trip comparison?)
+TRIP
+ - specialties
+ABOUT
+ - general info
