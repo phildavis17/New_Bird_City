@@ -63,6 +63,8 @@ def report_val(obs_val: float, precision=1) -> str:
             return special_str
     return f"{round(obs_val * 100, precision)}%"
 
+def sort_dict(in_dict: dict)
+
 
 class Analysis:
     def __init__(self, loc_ids: list, period: int, name: str) -> None:
@@ -141,13 +143,15 @@ class Analysis:
 
 
 class Trip:
-    def __init__(self) -> None:
-        self.title = ""
+    def __init__(self, obs_dict: dict, period) -> None:
+        self.title = None  # TItle optional?
         self.period = None
-        self.hs_bv = None
         self.hotspots = None
         self.observations = {}
-        self.specialties = {}
+        self.specialties = self.build_specialties_dict(self.observations)
+
+    def build_specialties_dict(self) -> dict:
+        pass
 
 
 if __name__ == "__main__":
@@ -174,4 +178,6 @@ if __name__ == "__main__":
     #    print(park)
     #    print(bk.report_dict(obs))
     print(bk.report_dict(bk.get_sp_obs("Snow Goose")))
+    print(bk.report_dict(bk.build_cumulative_obs_dict()))
+    bk.hs_is_active[PROSPECT_PARK] = False
     print(bk.report_dict(bk.build_cumulative_obs_dict()))
