@@ -63,7 +63,10 @@ def report_val(obs_val: float, precision=1) -> str:
             return special_str
     return f"{round(obs_val * 100, precision)}%"
 
-def sort_dict(in_dict: dict)
+def sort_dict_alpha(in_dict: dict):
+    pass
+
+def sort_dict_
 
 
 class Analysis:
@@ -153,6 +156,11 @@ class Trip:
     def build_specialties_dict(self) -> dict:
         pass
 
+    def simulate(self) -> set:
+        """Simulates an outing, returning a set of species that are hits in the sim."""
+        pass
+
+    def 
 
 if __name__ == "__main__":
 
