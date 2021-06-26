@@ -6,10 +6,10 @@ import random
 import uuid
 
 from collections import defaultdict
-
+from typing import Union
 
 from sqlalchemy import create_engine
-from sqlalchemy.orm import Session, sessionmaker
+from sqlalchemy.orm import Session, raiseload, sessionmaker
 from db_definitions import Observation, Species, Hotspot, Period
 
 ENGINE = create_engine("sqlite:///data/vagrant_db.db")
@@ -162,6 +162,16 @@ class Analysis:
             for hs, active in self.hs_is_active.items()
             if active
         }
+
+    def trip_dict_from_loc_ids(self, included_hs: Union[list, set]) -> dict:
+        return {hs: obs for hs, obs in self.observations.items() if hs in included_hs}
+
+    def trip_dict_from_bv(self, hs_bv: str) -> dict:
+        if len(hs_bv) != len(self.hotspot_ids):
+            raise ValueError(
+                f"len of hotspot bit vector was {len(hs_bv)}. Expected {len(self.hotspot_ids)}."
+            )
+        # get from BV to
 
     @staticmethod
     def find_delta(obs_dict_a: dict, obs_dict_b: dict) -> dict:
