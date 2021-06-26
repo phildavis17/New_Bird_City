@@ -63,10 +63,9 @@ def report_val(obs_val: float, precision=1) -> str:
             return special_str
     return f"{round(obs_val * 100, precision)}%"
 
+
 def sort_dict_alpha(in_dict: dict):
     pass
-
-def sort_dict_
 
 
 class Analysis:
@@ -129,6 +128,42 @@ class Analysis:
         """
         return {k: report_val(v) for k, v in obs_dict.items()}
 
+    def _average_obs(self, sp_name: str, hs_included: set = None) -> float:
+        """
+        Calculates the average observation value for a supplied species and list of hotspots.
+        If the list of hotspots is not included, will default to the Analysus objects full list.
+        """
+        # I've included the option to specify which hotspots to include in case I
+        # decide I only want the average of the OTHER hotspots.
+        if hs_included is None:
+            hs_included = {hs for hs in self.hotspot_ids if self.hs_is_active[hs]}
+        vals = [v for k, v in self.get_sp_obs(sp_name).items() if k in hs_included]
+        return sum(vals) / len(vals)
+
+    def _find_hs_specialties(self, loc_id: str) -> dict:
+        """
+        Returns a dictionary describing the extent to which the observation frequency of
+        each species at a hotspot exceeds the average observation frequency among the
+        other active hotspots, if such an excess exists.
+        """
+        other_hs = {hs for hs in self.hotspot_ids if self.hs_is_active[hs]}
+        other_hs.discard(loc_id)
+        return {
+            sp: round(obs - self._average_obs(sp, other_hs), 5)
+            for sp, obs in self.observations[loc_id].items()
+            if obs > self._average_obs(sp, other_hs)
+        }
+
+    def find_delta(self, other: "Analysis") -> dict:
+        """Returns a dict describing the per-species difference in obs values between two Analysis objects."""
+        # make a superset of sp names
+        # calculate the difference between THIS obs and THAT obs
+
+    def compare(self, other) -> dict:
+        # use find_delta to get a delta dict
+        # split it in to two lists with no negative numbers
+        pass
+
     @staticmethod
     def _bv_to_bools(bv: str) -> list:
         return [c == "1" for c in bv]
@@ -160,11 +195,11 @@ class Trip:
         """Simulates an outing, returning a set of species that are hits in the sim."""
         pass
 
-    def 
 
 if __name__ == "__main__":
 
     PROSPECT_PARK = "L109516"
+    PLUMB_BEACH = "L444485"
 
     # with Session() as this_session:
     #    print(hs_name_from_loc_id(this_session, PROSPECT_PARK))
@@ -189,3 +224,9 @@ if __name__ == "__main__":
     print(bk.report_dict(bk.build_cumulative_obs_dict()))
     bk.hs_is_active[PROSPECT_PARK] = False
     print(bk.report_dict(bk.build_cumulative_obs_dict()))
+    bk.hs_is_active[PROSPECT_PARK] = True
+    print("SPECIALTIES")
+    print("Prospect Park:")
+    print(bk._find_hs_specialties(PROSPECT_PARK))
+    print("Plumb Beach")
+    print(bk._find_hs_specialties(PLUMB_BEACH))
