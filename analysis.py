@@ -2,6 +2,7 @@
 # import barchart as bc
 # import file_manager as fm
 # import eBird_interface as eb
+import random
 import uuid
 
 from collections import defaultdict
@@ -154,15 +155,32 @@ class Analysis:
             if obs > self._average_obs(sp, other_hs)
         }
 
-    def find_delta(self, other: "Analysis") -> dict:
+    def build_specialties_dict(self) -> dict:
+        """Returns a dict of specialties dicts for each active hotspot."""
+        return {
+            hs: self._find_hs_specialties(hs)
+            for hs, active in self.hs_is_active.items()
+            if active
+        }
+
+    @staticmethod
+    def find_delta(obs_dict_a: dict, obs_dict_b: dict) -> dict:
         """Returns a dict describing the per-species difference in obs values between two Analysis objects."""
         # make a superset of sp names
         # calculate the difference between THIS obs and THAT obs
+        sp_set = set(obs_dict_a.keys())
+        sp_set.update(obs_dict_b.keys())
+        sp_list = list(sp_set)
+        sp_list.sort(key=sp_index_from_name)
+        return {sp: obs_dict_a[sp] - obs_dict_b[sp] for sp in sp_list}
 
-    def compare(self, other) -> dict:
-        # use find_delta to get a delta dict
-        # split it in to two lists with no negative numbers
-        pass
+    @staticmethod
+    def compare(obs_dict_a: dict, obs_dict_b: dict) -> list:
+        """Splits a delta dict into two dicts,"""
+        delta_dcit = Analysis.find_delta(obs_dict_a, obs_dict_b)
+        a_dict = {sp: delta for sp, delta in delta_dcit if delta > 0}
+        b_dict = {sp: delta for sp, delta in delta_dcit if delta < 0}
+        return [a_dict, b_dict]
 
     @staticmethod
     def _bv_to_bools(bv: str) -> list:
@@ -171,6 +189,16 @@ class Analysis:
     @staticmethod
     def _bools_to_bv(bools: list) -> str:
         return "".join([str(int(b)) for b in bools])
+
+    @staticmethod
+    def simulate(obs_dict: dict) -> set:
+        """Takes an observations dict and generates a"""
+        seen_birds = set()
+        for park_dict in obs_dict.values():
+            seen_birds.update(
+                {sp for sp, obs in park_dict.items() if obs > random.random()}
+            )
+        return seen_birds
 
     #  Builtins
     def __len__(self):
@@ -220,13 +248,16 @@ if __name__ == "__main__":
     # for park, obs in bk.observations.items():
     #    print(park)
     #    print(bk.report_dict(obs))
-    print(bk.report_dict(bk.get_sp_obs("Snow Goose")))
-    print(bk.report_dict(bk.build_cumulative_obs_dict()))
-    bk.hs_is_active[PROSPECT_PARK] = False
-    print(bk.report_dict(bk.build_cumulative_obs_dict()))
-    bk.hs_is_active[PROSPECT_PARK] = True
-    print("SPECIALTIES")
-    print("Prospect Park:")
-    print(bk._find_hs_specialties(PROSPECT_PARK))
-    print("Plumb Beach")
-    print(bk._find_hs_specialties(PLUMB_BEACH))
+    # print(bk.report_dict(bk.get_sp_obs("Snow Goose")))
+    # print(bk.report_dict(bk.build_cumulative_obs_dict()))
+    # bk.hs_is_active[PROSPECT_PARK] = False
+    # print(bk.report_dict(bk.build_cumulative_obs_dict()))
+    # bk.hs_is_active[PROSPECT_PARK] = True
+    # print("SPECIALTIES")
+    # print("Prospect Park:")
+    # print(bk._find_hs_specialties(PROSPECT_PARK))
+    # print("Plumb Beach")
+    # print(bk._find_hs_specialties(PLUMB_BEACH))
+    # print(bk.simulate(bk.observations))
+    for _ in range(10):
+        print(len(bk.simulate(bk.observations)))
