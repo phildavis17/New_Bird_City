@@ -1,76 +1,51 @@
-from app.trip import MASTER_TRIP, trip_from_index, report
 from flask import render_template, redirect, flash, url_for, request
-#from flask_wtf import FlaskForm
-#from wtforms import BooleanField, SubmitField
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
+
 from app import app
-from app import trip
-from app.trip import Trip
-from app.forms import MyForm
+from app import analysis
 
-#import app.trip
+# from app.analysis import Analysis
 
-@app.route('/')
-@app.route('/index')
+engine = create_engine("sqlite:///data/vagrant_db.db")
+Session = sessionmaker()
+Session.configure(bind=engine)
+session = Session()
+
+
+@app.route("/")
+@app.route("/index")
 def index():
-    #user = {'username': 'Miguel'}
-    return render_template('index.html')
-
-@app.route('/base/<title>')
-def base(title):
-    #title = "this is a test"/
-    return render_template('base.html', title=title)
-
-#newbirdcity/analysis/001101110/prospect park (birds that are specialties of this park, while on this route)
-#newbirdcity/analysis/11111111111111/prospect park
-#newbirdcity/analysis/prospect park (basline info about prospect park)
-
-@app.route('/analysis')
-def analysis():
-    title = "Hotspot Analysis"
-    #dummy_trip = trip.build_master_trip(MASTER_TRIP)
-    hotspots = MASTER_TRIP["Hotspot Names"]
-    species = report(MASTER_TRIP["Birds"])
-    return render_template('analysis.html', title=title, hotspots=hotspots, birds=species)
+    user = {"username": "Demo_User_001"}
+    return render_template("index.html", user=user)
 
 
-@app.route('/analysis/species/<sp_name>')
-def analysis_species(sp_name):
+@app.route("/about")
+def about():
+    return "New Bird City helps you get ready to see birds."
+
+
+@app.route("/<username>")
+def user_page(username: str):
+    with Session() as user_session:
+        user = dict()
+        user["username"] = "Demo_User_001"
+        user["trips"] = analysis.get_user_analyses(user_session, user["username"])
+    return render_template("user_page.html", user=user)
+
+
+@app.route("/<username>/<tripname>")
+def trip_page(username: str, tripname: str):
     pass
 
 
-@app.route('/analysis/hotspots/<hs_name>') # the /hotspots/ part saves me from having to decide whether the thing submitted is a park or a bird
-def analysis_hotspot(hs_name):
+@app.route("/<username>/<tripname>/<hsbv>")
+def trip_details_page(username: str, tripname: str, hsbv: str):
     pass
 
 
-@app.route('/analysis/<trip_index>')
-def hs_trip(trip_index):
-    new_trip = trip_from_index(MASTER_TRIP, trip_index)
-    return render_template('trip.html', this_trip=new_trip)
+# ---Dormant---
 
-
-@app.route('/analysis/<trip_index>/specialties')
-def specialties(trip_index):
-    new_trip = trip_from_index(MASTER_TRIP, trip_index)
-    return render_template('specialties.html', this_trip=new_trip)
-
-
-@app.route('/analysis/<trip_index>/hotspot/<hotspot_name>')
-def trip_park(trip_index, park_name):
-    new_trip = trip_from_index(MASTER_TRIP, trip_index)
-    return render_template('trip_hotspot.html', master_dict=MASTER_TRIP, this_trip=new_trip, this_hotspot=hotspot_name)
-
-@app.route('/map')
-def map_page():
-    return render_template('map.html')
-
-@app.route('/form_test', methods=['GET', 'POST'])
-def form_test():
-    form = MyForm()
-    if request.method == 'POST' and form.validate_on_submit():
-        return redirect(url_for("hs_trip", trip_index=request.form['name']))
-    return render_template('form.html', form=form)
-    
-
-# Would I then do something like /analysis/<rt_index>/hotspots/<hotspot>
-# and then                       /analysis/<rt_index>/species/<species>
+# Login
+# Map
+# seen birds

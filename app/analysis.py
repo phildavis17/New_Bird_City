@@ -10,7 +10,14 @@ from typing import Union
 
 from sqlalchemy import create_engine
 from sqlalchemy.orm import Session, raiseload, sessionmaker
-from db_definitions import Observation, Species, Hotspot, Period
+from db_definitions import (
+    Observation,
+    Species,
+    Hotspot,
+    Period,
+    AnalysisConfig,
+    HotspotConfig,
+)
 
 ENGINE = create_engine("sqlite:///data/vagrant_db.db")
 Session = sessionmaker()
@@ -67,6 +74,14 @@ def report_val(obs_val: float, precision=1) -> str:
 
 def sort_dict_alpha(in_dict: dict):
     pass
+
+
+def get_user_analyses(session: Session, username: str) -> dict:
+    q = session.query(AnalysisConfig).filter(AnalysisConfig.UserId == username)
+    analysis_dict = {}
+    for config in q:
+        analysis_dict[config.AnalysisName] = config.AnalysisId
+    return analysis_dict
 
 
 class Analysis:
