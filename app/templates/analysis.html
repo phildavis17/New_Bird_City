@@ -5,40 +5,47 @@
     <script src="{{ url_for('static', filename='analysisscript.js') }}"></script>
 {% endblock %}
 
+{% block nav %}
+    <a href="{{ url_for('user_page', username=user.username) }}">Back to my trips</a>
+{% endblock %}
+
 {% block content %}
     <form method="GET" id="trip_creation_form"></form>
 
-    <button type="submit" form="trip_creation_form">Generate Route</button>
+    <button type="submit" form="trip_creation_form">Rebuild</button>
     <table class="table table-striped table-hover table-bordered table-sm">
         <thead>
             <tr>
                 <th>Species</th>
-                {% for hotspot in hotspots %}
+                {% for hotspot in trip.hotspot_names %}
                     <th>{{ hotspot }}</th>
                 {% endfor %}
+                <th>Cumulative</th>
             </tr>
             <tr id="includeRow">
                 <td></td>
-                {% for hotspot in hotspots %}
-                    <td><input form="trip_creation_form" type="checkbox" name="{{''.join(hotspot.split())}}" id="" class ="includeCB"  onclick="toggleActive()" checked></td>
+                {% for hotspot in trip.hotspot_names %}
+                    <td><input form="trip_creation_form" type="checkbox" name="{{ ''.join(hotspot.split()) }}" id="" class ="includeCB"  onclick="toggleActive()" checked></td>
                 {% endfor %}
+                <td></td>
             </tr>
         </thead>
         <tbody>
-            {% for species in birds %}
+            {% for species in trip.sp_list %}
                 <tr class="spRow {{ ''.join(species.split()) }}" }}>
                     <td class="spName">{{ species }}</td>
-                    {% for hotspot in hotspots %}
-                        {% if birds[species][hotspot] == "-" %}
-                            <td class="noObs active {{ ''.join(hotspot.split()) }}" >{{ birds[species][hotspot] }}</td>
-                        {% elif birds[species][hotspot] == "<1%" %}
-                            <td class="lowObs active {{ ''.join(hotspot.split()) }}">{{ birds[species][hotspot] }}</td>
-                        {% elif birds[species][hotspot] == ">99%" %}
-                            <td class="highObs active {{ ''.join(hotspot.split()) }}">{{ birds[species][hotspot] }}</td>
+                    {% for hotspot in trip.observations %}
+                        {% if trip.report_obs(hotspot, species) == "-" %}
+                            <td class="noObs active {{ ''.join(hotspot.split()) }}" >{{ trip.report_obs(hotspot, species) }}</td>
+                        {% elif trip.report_obs(hotspot, species) == "<1%" %}
+                            <td class="lowObs active {{ ''.join(hotspot.split()) }}">{{ trip.report_obs(hotspot, species) }}</td>
+                        {% elif trip.report_obs(hotspot, species) == ">99%" %}
+                            <td class="highObs active {{ ''.join(hotspot.split()) }}">{{ trip.report_obs(hotspot, species) }}</td>
                         {% else %}
-                            <td class="birdObs active {{ ''.join(hotspot.split()) }}">{{ birds[species][hotspot] }}</td>
+                            <td class="birdObs active {{ ''.join(hotspot.split()) }}">{{ trip.report_obs(hotspot, species) }}</td>
                         {% endif %}
                     {% endfor %}
+                    <td>{{ trip.report_dict(trip.build_cumulative_obs_dict())[species] }}</td>
                 </tr>
             {% endfor %}
         </tbody>
