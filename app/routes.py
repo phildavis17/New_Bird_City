@@ -34,9 +34,12 @@ def user_page(username: str):
     return render_template("user_page.html", user=user)
 
 
-@app.route("/user/<username>/<tripname>")
-def trip_page(username: str, tripname: str):
-    return "I'm workin on it, ok????"
+@app.route("/user/<username>/<tripid>")
+def trip_page(username: str, tripid: str):
+    user = {"username": username}
+    with session as trip_session:
+        trip = analysis.build_analysis(trip_session, tripid)
+    return render_template("analysis.html", user=user, trip=trip)
 
 
 @app.route("/user/<username>/<tripname>/<hsbv>")

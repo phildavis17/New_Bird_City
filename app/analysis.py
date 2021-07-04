@@ -2,6 +2,7 @@
 # import barchart as bc
 # import file_manager as fm
 # import eBird_interface as eb
+import logging
 import random
 import uuid
 
@@ -10,14 +11,16 @@ from typing import Union
 
 from sqlalchemy import create_engine
 from sqlalchemy.orm import Session, raiseload, sessionmaker
-from db_definitions import (
+from app.db_definitions import (
     Observation,
     Species,
     Hotspot,
-    Period,
+    # Period,
     AnalysisConfig,
     HotspotConfig,
 )
+
+logging.basicConfig(level=logging.WARNING)
 
 ENGINE = create_engine("sqlite:///data/vagrant_db.db")
 Session = sessionmaker()
@@ -52,8 +55,9 @@ def obs_dict_from_db(session: Session, loc_id: str, period: int) -> dict:
 
 def hs_name_from_loc_id(session: Session, loc_id: str) -> str:
     """Returns the Hotspot name associated with the supplied loc id in the databse."""
-    q = session.query(Hotspot).filter(Hotspot.LocId == loc_id).limit(1)
-    return q.first().Name
+    q = session.query(Hotspot).filter(Hotspot.LocId == loc_id)
+    logging.debug(f"{loc_id=}")
+    return q[0].Name
 
 
 def report_val(obs_val: float, precision=1) -> str:
@@ -82,6 +86,24 @@ def get_user_analyses(session: Session, username: str) -> dict:
     for config in q:
         analysis_dict[config.AnalysisName] = config.AnalysisId
     return analysis_dict
+
+
+def get_analysis_loc_ids(session: Session, analysis_id: str) -> list:
+    q = session.query(HotspotConfig).filter(HotspotConfig.AnalysisId == analysis_id)
+    logging.debug(q.count())
+    return [hs.LocId for hs in q]
+
+
+def build_analysis(session: Session, analysis_id: str) -> "Analysis":
+    q = (
+        session.query(AnalysisConfig)
+        .filter(AnalysisConfig.AnalysisId == analysis_id)
+        .limit(1)
+    )
+    period = q.first().PeriodId
+    name = q.first().AnalysisName
+    locs = get_analysis_loc_ids(session, analysis_id)
+    return Analysis(locs, period, name)
 
 
 class Analysis:
@@ -128,12 +150,12 @@ class Analysis:
         """
         c_dict = {}
         for sp_name in self.sp_list:
-            obs = 1
+            obs_rate = 1
             for loc_id, val in self.get_sp_obs(sp_name).items():
                 if not self.hs_is_active[loc_id]:
                     continue
-                obs *= 1 - val
-            c_dict[sp_name] = round(1 - obs, 5)
+                obs_rate *= 1 - val
+            c_dict[sp_name] = round(1 - obs_rate, 5)
         return c_dict
 
     @classmethod
@@ -143,6 +165,9 @@ class Analysis:
         Uses _report_val() to replace special values with special characters.
         """
         return {k: report_val(v) for k, v in obs_dict.items()}
+    
+    def report_obs(self, loc_id: str, sp_name: str) -> str:
+        return report_val(self.observations[loc_id][sp_name])
 
     def _average_obs(self, sp_name: str, hs_included: set = None) -> float:
         """
@@ -268,11 +293,11 @@ if __name__ == "__main__":
         "L385839",
         "L444485",
     ]
-    bk = Analysis(BKHS, 17, "Brooklyn, baby")
-    print(bk)
-    for park, obs in bk.observations.items():
-        print(park)
-        print(bk.report_dict(obs))
+    # bk = Analysis(BKHS, 17, "Brooklyn, baby")
+    # print(bk)
+    # for park, obs in bk.observations.items():
+    #    print(park)
+    #    print(bk.report_dict(obs))
     # print(bk.report_dict(bk.get_sp_obs("Snow Goose")))
     # print(bk.report_dict(bk.build_cumulative_obs_dict()))
     # bk.hs_is_active[PROSPECT_PARK] = False
@@ -286,3 +311,20 @@ if __name__ == "__main__":
     # print(bk.simulate(bk.observations))
     # for _ in range(10):
     #    print(len(bk.simulate(bk.observations)))
+    with Session() as test_session:
+        ids = get_analysis_loc_ids(test_session, "c322d36f-048e-4b5c-9adf-a6640fd1f050")
+        for hs in ids:
+            print(hs)
+            print(hs_name_from_loc_id(test_session, hs))
+        # hs_q = test_session.query(Hotspot)
+        # for hs in hs_q:
+        #    print(f"{hs.LocId}: {hs.Name}")
+        # an_q = test_session.query(AnalysisConfig)
+        # print(an_q.count())
+        # for a in an_q:
+        #    print(f"{a.AnalysisName}: {a.AnalysisId}")
+        test_analysis = build_analysis(
+            test_session, "c322d36f-048e-4b5c-9adf-a6640fd1f050"
+        )
+        for hs, obs in test_analysis.observations.items():
+            print(test_analysis.report_dict(obs))
