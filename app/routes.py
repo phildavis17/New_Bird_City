@@ -25,7 +25,7 @@ def about():
     return "New Bird City helps you get ready to see birds."
 
 
-@app.route("/<username>")
+@app.route("/user/<username>")
 def user_page(username: str):
     with Session() as user_session:
         user = dict()
@@ -34,12 +34,12 @@ def user_page(username: str):
     return render_template("user_page.html", user=user)
 
 
-@app.route("/<username>/<tripname>")
+@app.route("/user/<username>/<tripname>")
 def trip_page(username: str, tripname: str):
-    pass
+    return "I'm workin on it, ok????"
 
 
-@app.route("/<username>/<tripname>/<hsbv>")
+@app.route("/user/<username>/<tripname>/<hsbv>")
 def trip_details_page(username: str, tripname: str, hsbv: str):
     pass
 

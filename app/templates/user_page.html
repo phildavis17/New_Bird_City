@@ -9,7 +9,7 @@
 <p>My Trips</p>
 <ul>
     {% for name, id in user.trips.items() %}
-    <li><a href="/{{ user.username }}/{{ id }}">{{ name }}</a></li>
+    <li><a href="{{ url_for('trip_page', username=user.username, tripname=id)}}">{{ name }}</a></li>
     {% endfor %}
 </ul>
 {% endblock %}

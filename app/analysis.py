@@ -270,9 +270,9 @@ if __name__ == "__main__":
     ]
     bk = Analysis(BKHS, 17, "Brooklyn, baby")
     print(bk)
-    # for park, obs in bk.observations.items():
-    #    print(park)
-    #    print(bk.report_dict(obs))
+    for park, obs in bk.observations.items():
+        print(park)
+        print(bk.report_dict(obs))
     # print(bk.report_dict(bk.get_sp_obs("Snow Goose")))
     # print(bk.report_dict(bk.build_cumulative_obs_dict()))
     # bk.hs_is_active[PROSPECT_PARK] = False
@@ -284,5 +284,5 @@ if __name__ == "__main__":
     # print("Plumb Beach")
     # print(bk._find_hs_specialties(PLUMB_BEACH))
     # print(bk.simulate(bk.observations))
-    for _ in range(10):
-        print(len(bk.simulate(bk.observations)))
+    # for _ in range(10):
+    #    print(len(bk.simulate(bk.observations)))

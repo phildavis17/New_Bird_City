@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
 {% block content %}
-<p>Hello, {{ user.username }}, and welcome to my project.</p>
-<a href="/analysis">Continue to Analysis</a>
+<p>Hello, {{ user.username }}, and welcome to New Bird City.</p>
+<a href="{{ url_for('user_page', username=user.username) }}">Continue to my trips</a>
 {% endblock %}
