@@ -11,6 +11,8 @@ td {
 
 .includeCB {
     align-self: center;
+    text-align: center;
+    vertical-align: middle;
 }
 
 .noObs {
