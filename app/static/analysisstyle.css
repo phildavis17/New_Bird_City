@@ -4,6 +4,7 @@ th {
 
 td {
     align-self: center;
+    text-align: center;
 }
 
 .active {
@@ -16,7 +17,7 @@ td {
 }
 
 .noObs {
-    color: rgb(200, 200, 200);
+    color: rgb(100, 100, 100);
     text-align: center;
 }
 
@@ -32,8 +33,9 @@ td {
 
 .spName {
     font-weight: bold;
+    text-align: left;
 }
 
 .table {
-    margin: 20px;
+    /* margin: 20px; */
 }
