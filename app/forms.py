@@ -9,4 +9,5 @@ class MyForm(FlaskForm):
 
 
 
-#class TripCreationForm(FlaskForm):
+class TripCreationForm(FlaskForm):
+    pass
