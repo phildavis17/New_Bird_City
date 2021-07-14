@@ -14,6 +14,7 @@
 <table id="sp-table" class="table table-striped table-hover table-bordered table-sm">
     <thead>
         <tr>
+            <th class="sp-index">Sp. Index</th>
             <th class="header-species" onclick="sortSp()">Species</th>
             {% for hotspot in trip.hotspot_names %}
             <th class = header-hotspot onclick="sortHS('{{ hotspot }}')">{{ hotspot }}</th>
@@ -21,6 +22,7 @@
             <th class="header-cumulative" onclick="sortCumulative()">Cumulative</th>
         </tr>
         <tr id="includeRow">
+            <td class="sp-index"></td>
             <td></td>
             {% for hs_id in trip.hotspot_ids %}
             <td><input form="trip_creation_form" type="checkbox" name="{{ hs_id }}" id=""
@@ -32,6 +34,7 @@
     <tbody>
         {% for species in trip.sp_list %}
         <tr class="spRow {{ ''.join(species.split()) }}" }}>
+            <td class="sp-index sp-index-num">{{ loop.index }}</td>
             <td class="spName">{{ species }}</td>
             {% for hotspot in trip.hotspot_ids %}
                 {% if trip.report_obs(hotspot, species) == "-" %}

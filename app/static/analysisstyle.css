@@ -38,3 +38,8 @@ td {
 
 .table-sortable {
 }
+
+.sp-index{
+    display: none;
+    /*visibility: hidden;*/
+}

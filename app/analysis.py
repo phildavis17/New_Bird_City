@@ -67,8 +67,8 @@ def report_val(obs_val: float, precision=1) -> str:
     """
     SPECIAL_CONDITIONS = {
         lambda x: x == 0: "-",
-        lambda x: x < 0.01: "<1%",
-        lambda x: x > 0.99: ">99%",
+        lambda x: x <= 0.01: "<1%",
+        lambda x: x >= 0.99: ">99%",
     }
     for condition, special_str in SPECIAL_CONDITIONS.items():
         if condition(obs_val):

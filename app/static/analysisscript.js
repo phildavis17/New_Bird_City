@@ -19,11 +19,33 @@ function toggleActive() {
 
 
 function sortSp() {
-    alert("Sort Species");
+    //console.log("sp sort")
+    const spTable = document.getElementById('sp-table');
+    const tableBody = spTable.querySelector('tbody');
+    const rows = tableBody.querySelectorAll('tr');
+
+    const newRows = Array.from(rows)
+    newRows.sort(function(rowA, rowB) {
+        let cellA = rowA.querySelector('.sp-index-num').innerHTML;
+        let cellB = rowB.querySelector('.sp-index-num').innerHTML;
+
+        cellA = cellA.replace(/[^\. \d]/g, '');
+        cellB = cellB.replace(/[^\. \d]/g, '');
+        const numA = Number(cellA)
+        const numB = Number(cellB)
+
+        return numA - numB
+    });
+    [].forEach.call(rows, function(row) {
+        tableBody.removeChild(row);
+    });
+
+    newRows.forEach(function(newRow) {
+        tableBody.appendChild(newRow)
+    });
 };
 
 function sortCumulative() {
-    //alert("sort cumulative");
     const spTable = document.getElementById('sp-table');
     const tableBody = spTable.querySelector('tbody');
     const rows = tableBody.querySelectorAll('tr');
@@ -34,17 +56,11 @@ function sortCumulative() {
         let cellB = rowB.querySelector('.cumulativeObs').innerHTML;
 
         cellA = cellA.replace(/[^\. \d]/g, '');
-        cellB = cellA.replace(/[^\. \d]/g, '');
+        cellB = cellB.replace(/[^\. \d]/g, '');
         const numA = Number(cellA)
         const numB = Number(cellB)
-        //console.log(numA)
 
         return numA - numB
-        //switch (true) {
-        //    case numA > numB: return 1;
-        //    case numA < numB: return -1;
-        //    case numA === numB: return 0;
-        //}
     });
     [].forEach.call(rows, function(row) {
         tableBody.removeChild(row);
