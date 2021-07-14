@@ -1,12 +1,12 @@
 {% extends "base.html" %}
 
 {% block head %}
-<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='analysisstyle.css') }}">
-<script src="{{ url_for('static', filename='analysisscript.js') }}"></script>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='analysisstyle.css') }}">
+    <script src="{{ url_for('static', filename='analysisscript.js') }}"></script>
 {% endblock %}
 
 {% block nav %}
-<a href="{{ url_for('user_page', username=user.username) }}">Back to my trips</a>
+    <a href="{{ url_for('user_page', username=user.username) }}">Back to my trips</a>
 {% endblock %}
 
 {% block content %}
@@ -17,7 +17,7 @@
             <th class="sp-index">Sp. Index</th>
             <th class="header-species" onclick="sortSp()">Species</th>
             {% for hotspot in trip.hotspot_names %}
-            <th class = header-hotspot onclick="sortHS('{{ trip.hotspot_ids[loop.index - 1] }}')">{{ hotspot }}</th>
+                <th class = "header-hotspot" onclick="sortHS('{{ trip.hotspot_ids[loop.index - 1] }}')">{{ hotspot }}</th>
             {% endfor %}
             <th class="header-cumulative" onclick="sortCumulative()">Cumulative</th>
         </tr>
@@ -25,7 +25,7 @@
             <td class="sp-index"></td>
             <td></td>
             {% for hs_id in trip.hotspot_ids %}
-            <td><input form="trip_creation_form" type="checkbox" name="{{ hs_id }}" id=""
+                <td><input form="trip_creation_form" type="checkbox" name="{{ hs_id }}" id=""
                     class="includeCB" onclick="toggleActive()" checked></td>
             {% endfor %}
             <td><button type="submit" form="trip_creation_form">Rebuild</button></td>
@@ -48,6 +48,9 @@
                 {% endif %}
             {% endfor %}
             <td class="cumulativeObs">{{ trip.report_dict(trip.build_cumulative_obs_dict())[species] }}</td>
+            {% for hotspot in trip.hotspot_ids %}
+                <td class="realObs active {{ ''.join(hotspot.split()) }} {{ ''.join(species.split()) }}">{{ trip.observations[hotspot][species] }}</td>
+            {% endfor %}
         </tr>
         {% endfor %}
     </tbody>

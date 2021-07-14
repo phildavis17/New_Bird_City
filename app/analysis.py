@@ -168,7 +168,7 @@ class Analysis:
     
     def report_obs(self, loc_id: str, sp_name: str) -> str:
         return report_val(self.observations[loc_id][sp_name])
-
+    
     def _average_obs(self, sp_name: str, hs_included: set = None) -> float:
         """
         Calculates the average observation value for a supplied species and list of hotspots.

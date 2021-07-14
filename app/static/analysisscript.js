@@ -4,6 +4,8 @@ let cumlativeDirection = -1;
 let taxonSortType = "alpha 1";
 let hsDirections = {};
 
+
+
 function toggleActive() {
     const cbs = document.getElementsByClassName("includeCB");
     for (let cb of cbs) {
@@ -11,12 +13,49 @@ function toggleActive() {
         if (cb.checked == true) {
             for (let i of items) {
                 i.classList.remove("inactive");
+                i.classList.add("active");
             };
         } else {
             for (let i of items) {
+                i.classList.remove("active");
                 i.classList.add("inactive");
             };
         };
+    };
+    calculateCumulative();
+};
+
+function calculateCumulative() {
+    const spTable = document.getElementById('sp-table');
+    const tableBody = spTable.querySelector('tbody');
+    const rows = tableBody.querySelectorAll('tr');
+    //const realObs = tableBody.querySelectorAll('.realObs');
+
+    rows.forEach(function(row) {
+        realObs = row.querySelectorAll('.realObs');
+        totalOdds = 1.0;
+        realObs.forEach(function(obs) {
+            if (obs.classList.contains('active')) {
+                totalOdds *= 1 - Number(obs.innerHTML);
+            };
+        });
+        cumulativeObs = row.querySelector('.cumulativeObs');
+        cumulativeObs.innerHTML = reportVal(1.0 - totalOdds);
+    });
+
+    // Reset cumulative sorting, as the values have now changed
+    cumlativeDirection = -1;
+};
+
+function reportVal(val) {
+    switch (true){
+        case val >= 0.99:
+            return ">99%";
+        case val <= 0.01:
+            return "<1%";
+        default:
+            val = Math.round(val * 1000) / 10;
+            return val.toString() + "%";
     };
 };
 
@@ -115,3 +154,4 @@ function sortHS(hs) {
     cumlativeDirection = -1;
     taxonSortType = "taxon";
 };
+

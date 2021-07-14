@@ -43,3 +43,7 @@ td {
     display: none;
     /*visibility: hidden;*/
 }
+
+.realObs {
+    display: none;
+}
