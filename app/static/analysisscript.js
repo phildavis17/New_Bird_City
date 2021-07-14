@@ -1,5 +1,15 @@
 // Change 0.0 to gray color
-// Change text of values above 0.99 to ">99%"
+
+const headers = document.getElementsByTagName("th")
+let directions = Array.from(headers).map(function(header) {
+    return 'asc';
+});
+
+let cumlativeDirection = 1;
+let taxonDirection = 1;
+let hsDirections = {};
+//const hsHeaders = document.getElementsByClassName("header-hotspot");
+//let hsDirections = Array.from(hsHeaders)
 
 function toggleActive() {
     const cbs = document.getElementsByClassName("includeCB");
@@ -17,64 +27,48 @@ function toggleActive() {
     };
 };
 
-
-function sortSp() {
-    //console.log("sp sort")
+function numericalSortByIndex(index, multiplier) {
     const spTable = document.getElementById('sp-table');
     const tableBody = spTable.querySelector('tbody');
     const rows = tableBody.querySelectorAll('tr');
 
     const newRows = Array.from(rows)
     newRows.sort(function(rowA, rowB) {
-        let cellA = rowA.querySelector('.sp-index-num').innerHTML;
-        let cellB = rowB.querySelector('.sp-index-num').innerHTML;
+        let cellA = rowA.querySelector(index).innerHTML;
+        let cellB = rowB.querySelector(index).innerHTML;
 
         cellA = cellA.replace(/[^\. \d]/g, '');
         cellB = cellB.replace(/[^\. \d]/g, '');
-        const numA = Number(cellA)
-        const numB = Number(cellB)
+        const numA = Number(cellA) * multiplier;
+        const numB = Number(cellB) * multiplier;
 
-        return numA - numB
+        return numA - numB;
     });
     [].forEach.call(rows, function(row) {
         tableBody.removeChild(row);
     });
 
     newRows.forEach(function(newRow) {
-        tableBody.appendChild(newRow)
+        tableBody.appendChild(newRow);
     });
 };
 
-function sortCumulative() {
-    const spTable = document.getElementById('sp-table');
-    const tableBody = spTable.querySelector('tbody');
-    const rows = tableBody.querySelectorAll('tr');
+function sortSp() {
+    numericalSortByIndex('.sp-index-num', taxonDirection);
+    taxonDirection *= -1;
+};
 
-    const newRows = Array.from(rows)
-    newRows.sort(function(rowA, rowB) {
-        let cellA = rowA.querySelector('.cumulativeObs').innerHTML;
-        let cellB = rowB.querySelector('.cumulativeObs').innerHTML;
-
-        cellA = cellA.replace(/[^\. \d]/g, '');
-        cellB = cellB.replace(/[^\. \d]/g, '');
-        const numA = Number(cellA)
-        const numB = Number(cellB)
-
-        return numA - numB
-    });
-    [].forEach.call(rows, function(row) {
-        tableBody.removeChild(row);
-    });
-
-    newRows.forEach(function(newRow) {
-        tableBody.appendChild(newRow)
-    });
-
+function sortCumulative() {;
+    numericalSortByIndex('.cumulativeObs', cumlativeDirection);
+    cumlativeDirection *= -1;
 };
 
 function sortHS(hs) {
-    alert(hs);
+    //asc, desc
+    if (hsDirections.hasOwnProperty(hs)) {
+        hsDirections[hs] *= -1;
+    } else {
+        hsDirections[hs] = 1;
+    };
+    numericalSortByIndex('.' + hs, hsDirections[hs]);
 };
-//let chkBxs  = document.querySelectorAll('input[class=includeCB]');
-
-

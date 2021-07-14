@@ -17,7 +17,7 @@
             <th class="sp-index">Sp. Index</th>
             <th class="header-species" onclick="sortSp()">Species</th>
             {% for hotspot in trip.hotspot_names %}
-            <th class = header-hotspot onclick="sortHS('{{ hotspot }}')">{{ hotspot }}</th>
+            <th class = header-hotspot onclick="sortHS('{{ trip.hotspot_ids[loop.index - 1] }}')">{{ hotspot }}</th>
             {% endfor %}
             <th class="header-cumulative" onclick="sortCumulative()">Cumulative</th>
         </tr>
