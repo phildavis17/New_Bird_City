@@ -1,15 +1,8 @@
-// Change 0.0 to gray color
+// Some things to make the Analysis page more usable.
 
-const headers = document.getElementsByTagName("th")
-let directions = Array.from(headers).map(function(header) {
-    return 'asc';
-});
-
-let cumlativeDirection = 1;
-let taxonDirection = 1;
+let cumlativeDirection = -1;
+let taxonSortType = "alpha 1";
 let hsDirections = {};
-//const hsHeaders = document.getElementsByClassName("header-hotspot");
-//let hsDirections = Array.from(hsHeaders)
 
 function toggleActive() {
     const cbs = document.getElementsByClassName("includeCB");
@@ -53,22 +46,72 @@ function numericalSortByIndex(index, multiplier) {
     });
 };
 
+function alphaSortByIndex(index, multiplier) {
+    const spTable = document.getElementById('sp-table');
+    const tableBody = spTable.querySelector('tbody');
+    const rows = tableBody.querySelectorAll('tr');
+
+    const newRows = Array.from(rows)
+    newRows.sort(function(rowA, rowB) {
+        let cellA = rowA.querySelector(index).innerHTML;
+        let cellB = rowB.querySelector(index).innerHTML;
+
+        switch (true) {
+            case cellA > cellB: return 1 * multiplier;
+            case cellA < cellB: return -1 * multiplier;
+            case cellA === cellB: return 0;                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     
+        }
+    });
+    [].forEach.call(rows, function(row) {
+        tableBody.removeChild(row);
+    });
+
+    newRows.forEach(function(newRow) {
+        tableBody.appendChild(newRow);
+    });
+};
+
 function sortSp() {
-    numericalSortByIndex('.sp-index-num', taxonDirection);
-    taxonDirection *= -1;
+    // Sorts by positive Taxonomic, then positive alpha, then reverse alpha
+    switch (taxonSortType) {
+        case "alpha 1": 
+            alphaSortByIndex('.spName', 1);
+            taxonSortType = "alpha -1"
+            break;
+        case "alpha -1":
+            alphaSortByIndex('.spName', -1);
+            taxonSortType = "taxon";
+            break;
+        case "taxon":
+            numericalSortByIndex('.sp-index-num', 1);
+            taxonSortType = "alpha 1";
+            break;
+    }
+    
+    //reset other sort types
+    cumlativeDirection = -1;
+    hsDirections = {};
 };
 
 function sortCumulative() {;
     numericalSortByIndex('.cumulativeObs', cumlativeDirection);
     cumlativeDirection *= -1;
+    
+    // reset other sort types
+    taxonSortType = "taxon";
+    hsDirections = {};
+
 };
 
 function sortHS(hs) {
-    //asc, desc
     if (hsDirections.hasOwnProperty(hs)) {
         hsDirections[hs] *= -1;
     } else {
-        hsDirections[hs] = 1;
+        hsDirections[hs] = -1;
     };
     numericalSortByIndex('.' + hs, hsDirections[hs]);
+
+    // reset other sort types
+    cumlativeDirection = -1;
+    taxonSortType = "taxon";
 };
