@@ -1,13 +1,17 @@
 {% extends "base.html" %}
 
 
+{% block nav %}
+    <a href="{{ url_for('user_page', username=user.username) }}">Back to my trips</a>
+{% endblock %}
+
 {% block content %}
 
 <form action="">
     <label for="">Period</label>
     <select name="" id="">
         {% for p in range(48) %}
-        {{ p }}
+        <option value="">{{ p }}</option>
         {% endfor %}
     </select>
 </form>

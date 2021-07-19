@@ -53,8 +53,8 @@ def new_trip(username: str):
 @app.route("/user/<username>/edit/<tripid>")
 def edit_trip(username:str, tripid: str):
     user = {
-        username: username,
-        tripid: tripid,
+        "username": username,
+        "tripid": tripid,
     }
     return render_template("edit_trip.html", user=user)
 
