@@ -46,6 +46,18 @@ def trip_page(username: str, tripid: str):
 def trip_details_page(username: str, tripname: str, hsbv: str):
     pass
 
+@app.route("/user/<username>/new-trip")
+def new_trip(username: str):
+    return "Look, I'm workin on it, OK?"
+
+@app.route("/user/<username>/edit/<tripid>")
+def edit_trip(username:str, tripid: str):
+    user = {
+        username: username,
+        tripid: tripid,
+    }
+    return render_template("edit_trip.html", user=user)
+
 
 # ---Dormant---
 

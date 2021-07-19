@@ -4,10 +4,23 @@
 {% endblock %}
 
 {% block content %}
-<p>My Trips</p>
-<ul>
-    {% for name, id in user.trips.items() %}
-    <li><a href="{{ url_for('trip_page', username=user.username, tripid=id)}}">{{ name }}</a></li>
-    {% endfor %}
-</ul>
+<table>
+    <thead>
+        <tr>
+            <th>My Trips</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for name, id in user.trips.items() %}
+        <tr>
+            <td><a href="{{ url_for('trip_page', username=user.username, tripid=id) }}">{{ name }}</a></td>
+            <td></td>
+            <td><a href="{{ url_for('edit_trip', username=user.username, tripid=id) }}">Edit</a></td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+<br/>
+<a class="new_trip_link" href="{{ url_for('new_trip', username=user.username) }}">Create New Trip</a></li>
+
 {% endblock %}
