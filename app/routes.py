@@ -1,9 +1,12 @@
 from flask import render_template, redirect, flash, url_for, request
+from flask.helpers import make_response
 from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy.orm import relation, sessionmaker
+from wtforms import BooleanField
 
 from app import app
 from app import analysis
+from app.forms import MyForm, TripCreationForm 
 
 # from app.analysis import Analysis
 
@@ -34,17 +37,67 @@ def user_page(username: str):
     return render_template("user_page.html", user=user)
 
 
-@app.route("/user/<username>/<tripid>")
+@app.route("/user/<username>/<tripid>", methods = ["GET", "POST"])
 def trip_page(username: str, tripid: str):
-    user = {"username": username}
+    user = {"username": username}    
     with session as trip_session:
         trip = analysis.build_analysis(trip_session, tripid)
+        trip.trip_id = tripid
+        if request.method == "POST":
+            trip.set_hs_active_by_id(list(request.form.keys()))
+            return redirect(url_for("trip_details_page", username=username, tripid=tripid, hsbv=trip.get_current_bv()))
     return render_template("analysis.html", user=user, trip=trip)
 
 
-@app.route("/user/<username>/<tripname>/<hsbv>")
-def trip_details_page(username: str, tripname: str, hsbv: str):
+@app.route("/user/<username>/<tripid>/<hsbv>", methods = ["GET", "POST"])
+def trip_details_page(username: str, tripid: str, hsbv: str):
+    # I'm doing this in a stateless way, because my understanding is that this is in keeping
+    # with the general vibe of the web. Possible I'm wrong!
+    user = {"username": username}
+    with session as trip_session:
+        trip = analysis.build_analysis(trip_session, tripid)
+        trip.set_hs_active_by_bv(hsbv)
+    return render_template("trip.html", trip=trip)
+
+
+# TESTING        
+@app.route("/formtest", methods = ["GET", "POST"])
+def form_test():
+    form = MyForm()
+    if request.method == "POST" and form.validate_on_submit():
+        return redirect(url_for("form_output", text="test1"))
+    return render_template("form.html", form=form)
+
+# TESTING
+
+#! Option 1: rewrite HS selection form to be a wtform style thing
+# - Yet to figure out how to make such a form dynamic
+# - Cursury SO search suggests I'm not alone
+#! Option 2: Link directly to form results from current form defined in template
+# may not be the preferred method
+# it sure isn't working atm
+# Seems like it would require a lot of info in the template, which seems worse for maintainability
+#! Option 3: Intermediate redirect
+# go to an intermediate route after form submission that packages the form results
+# into something that the Trip Details route can understand, and redirect them.
+# how would this work with the back button?
+# more importantly, how does the intermediate know the username and trip name
+
+@app.route("/formtest/<username>", methods = ["GET", "POST"])
+def form_output(username: str):
+    form = TripCreationForm()
+    for c in username:
+        setattr(form, c, BooleanField())
+    return render_template("output.html", form=form)
+
+@app.route("/mr-test/<content>", methods = ["POST"])
+def mr_test(content):
     pass
+
+@app.route("/intermediate", methods = ["POST"])
+def trip_processor():
+    hs_ids = str(request.form.keys())
+    return make_response(hs_ids)
 
 @app.route("/user/<username>/new-trip")
 def new_trip(username: str):
@@ -59,8 +112,10 @@ def edit_trip(username:str, tripid: str):
     return render_template("edit_trip.html", user=user)
 
 
+
 # ---Dormant---
 
 # Login
 # Map
 # seen birds
+# trip details

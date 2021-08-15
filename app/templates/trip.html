@@ -1,5 +1,10 @@
 {% extends "base.html" %}
 
+{% block head %}
+    {# <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='analysisstyle.css') }}"> #}
+    {# <script src="{{ url_for('static', filename='analysisscript.js') }}"></script> #}
+{% endblock %}
+
 {% block nav %}
     <a href="{{ url_for('index') }}">Back to Analysis</a>
     <a href="/specialties">See Specialties</a>
@@ -7,26 +12,29 @@
 
 {% block content %}
     <div>
-        <p>Parks:</p>    
-        <ul>
-            {% for hotspot in this_trip.hotspots %}
-                <li>{{ hotspot }}</li>
-            {% endfor %}    
-        </ul>
-    </div>
-    <div>
-        <table>
-            <caption>Birds On This Trip</caption>
+        <table id="sp-table" class="table table-striped table-hover table-bordered table-sm">
             <thead>
                 <tr>
                     <th>Species</th>
-                    <th>Probablility</th>
+                    {% for hotspot in trip.build_trip_dict() %}
+                        <th class = header-hotspot>{{ hotspot }}</th>
+                    {% endfor %}
+                    <th>Cumulative</th>
+                </tr>
+                <tr>
+                    <td></td>
+                    {% for hotspot in trip_dict %}
+                        <td></td>
+                    {% endfor %}
                 </tr>
             </thead>
-            {% for bird in this_trip.birds %}
+            {% for bird in  trip.build_trip_sp_list() %}
                 <tr>
                     <td>{{ bird }}</td>
-                    <td>{{ this_trip.birds[bird] }}</td>
+                    {% for hotspot in trip.build_trip_dict() %}
+                        {#! There's gotta be a way to use some variables in here, right?#}
+                        <td>{{ trip.build_trip_dict()[hotspot][bird] }}</td>
+                    {% endfor %}
                 </tr>
             {% endfor %}
         </table>

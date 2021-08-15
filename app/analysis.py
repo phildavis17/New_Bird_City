@@ -7,7 +7,7 @@ import random
 import uuid
 
 from collections import defaultdict
-from typing import Union
+from typing import Iterable, Union
 
 from sqlalchemy import create_engine
 from sqlalchemy.orm import Session, raiseload, sessionmaker
@@ -131,13 +131,43 @@ class Analysis:
             )
             self.sp_list = self.build_master_sp_list(init_session)
 
+    def set_hs_active_by_id(self, loc_ids: Iterable[str] ) -> None:
+        """Takes a list of loc_ids and sets them to active. All other ids become inactive."""
+        self.hs_is_active = {id: id in loc_ids for id in self.hotspot_ids}
+
+    def set_all_hs_active(self) -> None:
+        """Sets all the hotspots in the Analysis to active."""
+        self.hs_is_active = {id: True for id in self.hotspot_ids}
+    
+    def set_hs_active_by_bv(self, bv: str) -> None:
+        """
+        Sets hotspots to active or inactive based on a supplied bitvector string.
+        "1" indicates active. All other values considered inactive.
+        """
+        if len(bv) != len(self.hotspot_ids):
+            raise ValueError(
+                f"len of hotspot bit vector was {len(bv)}. Expected {len(self.hotspot_ids)}."
+            )
+        for hs, bit in zip(self.hotspot_ids, list(bv)):
+            self.hs_is_active[hs] = bit == "1"
+
+    # ! Marked for deletion
     def trip_from_bv(self, bv: str) -> "Trip":
         """Returns a Trip object including or excluding hotspots based on the supplied bit vector string."""
         locs = [loc for loc, bit in zip(self.hotspot_ids, bv) if bit == "1"]
         pass
 
+    def get_current_bv(self) -> str:
+        """Generates a 1 and 0 bit vector string describing which hotspots are currently enabled."""
+        return "".join([str(int(b)) for _, b in self.hs_is_active.items()])
+
     def get_sp_obs(self, sp_name: str) -> dict:
+        """Returns a dict of observations of a supplied species at all hotspots."""
         return {hs: self.observations[hs][sp_name] for hs in self.hotspot_ids}
+
+    def get_trip_sp_obs(self, sp_name: str) -> dict:
+        """Returns a dict of observations of a supplied species at all *active* hotspots."""
+        return {hs: self.observations[hs][sp_name] for hs, active in self.hs_is_active.items() if active}
 
     def build_master_sp_list(self, session: Session) -> list:
         """Returns a list of unique species in the all the hotspots in the Analysis in taxonomic order."""
@@ -212,6 +242,13 @@ class Analysis:
                 f"len of hotspot bit vector was {len(hs_bv)}. Expected {len(self.hotspot_ids)}."
             )
         # get from BV to
+    
+    def build_trip_dict(self) -> dict:
+        return {hs: obs for hs, obs in self.observations.items() if self.hs_is_active[hs]}
+
+    def build_trip_sp_list(self) -> list:
+        """Returns a list of species that are present in the currently active hotspots."""
+        return [sp for sp in self.sp_list if any(self.get_trip_sp_obs(sp).values())]
 
     @staticmethod
     def find_delta(obs_dict_a: dict, obs_dict_b: dict) -> dict:
