@@ -1,63 +1,9 @@
-// Some things to make the Analysis page more usable.
-
 let cumlativeDirection = -1;
 let taxonSortType = "alpha 1";
 let hsDirections = {};
 
-
-
-function toggleActive() {
-    const cbs = document.getElementsByClassName("includeCB");
-    for (let cb of cbs) {
-        let items = document.getElementsByClassName(cb.name);
-        if (cb.checked == true) {
-            for (let i of items) {
-                i.classList.remove("inactive");
-                i.classList.add("active");
-            };
-        } else {
-            for (let i of items) {
-                i.classList.remove("active");
-                i.classList.add("inactive");
-            };
-        };
-    };
-    calculateCumulative();
-};
-
-function calculateCumulative() {
-    const spTable = document.getElementById('sp-table');
-    const tableBody = spTable.querySelector('tbody');
-    const rows = tableBody.querySelectorAll('tr');
-    //const realObs = tableBody.querySelectorAll('.realObs');
-
-    rows.forEach(function(row) {
-        realObs = row.querySelectorAll('.realObs');
-        totalOdds = 1.0;
-        realObs.forEach(function(obs) {
-            if (obs.classList.contains('active')) {
-                totalOdds *= 1 - Number(obs.innerHTML);
-            };
-        });
-        cumulativeObs = row.querySelector('.cumulativeObs');
-        cumulativeObs.innerHTML = reportVal(1.0 - totalOdds);
-    });
-
-    // Reset cumulative sorting, as the values have now changed
-    cumlativeDirection = -1;
-};
-
-function reportVal(val) {
-    switch (true){
-        case val >= 0.99:
-            return ">99%";
-        case val <= 0.01:
-            return "<1%";
-        default:
-            val = Math.round(val * 1000) / 10;
-            return val.toString() + "%";
-    };
-};
+// The sorting is a little different on this page, because the values are all static
+// That is, unless, I toggle between obs and specialties view modes
 
 function numericalSortByIndex(index, multiplier) {
     const spTable = document.getElementById('sp-table');
@@ -85,6 +31,7 @@ function numericalSortByIndex(index, multiplier) {
     });
 };
 
+
 function alphaSortByIndex(index, multiplier) {
     const spTable = document.getElementById('sp-table');
     const tableBody = spTable.querySelector('tbody');
@@ -110,6 +57,7 @@ function alphaSortByIndex(index, multiplier) {
     });
 };
 
+
 function sortSp() {
     // Sorts by positive Taxonomic, then positive alpha, then reverse alpha
     switch (taxonSortType) {
@@ -130,27 +78,5 @@ function sortSp() {
     //reset other sort types
     cumlativeDirection = -1;
     hsDirections = {};
-};
-
-function sortCumulative() {;
-    numericalSortByIndex('.cumulativeObs', cumlativeDirection);
-    cumlativeDirection *= -1;
-    
-    // reset other sort types
-    taxonSortType = "taxon";
-    hsDirections = {};
-};
-
-function sortHS(hs) {
-    if (hsDirections.hasOwnProperty(hs)) {
-        hsDirections[hs] *= -1;
-    } else {
-        hsDirections[hs] = -1;
-    };
-    numericalSortByIndex('.' + hs, hsDirections[hs]);
-
-    // reset other sort types
-    cumlativeDirection = -1;
-    taxonSortType = "taxon";
 };
 
