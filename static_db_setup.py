@@ -38,7 +38,7 @@ Session.configure(bind=engine)
 session = Session()
 
 logging.basicConfig(level=logging.INFO)
-
+logging.info("Rebuilding database")
 # Periods
 logging.info("Starting periods")
 for p in range(48):
