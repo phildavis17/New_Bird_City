@@ -70,19 +70,6 @@ def form_test():
 
 # TESTING
 
-#! Option 1: rewrite HS selection form to be a wtform style thing
-# - Yet to figure out how to make such a form dynamic
-# - Cursury SO search suggests I'm not alone
-#! Option 2: Link directly to form results from current form defined in template
-# may not be the preferred method
-# it sure isn't working atm
-# Seems like it would require a lot of info in the template, which seems worse for maintainability
-#! Option 3: Intermediate redirect
-# go to an intermediate route after form submission that packages the form results
-# into something that the Trip Details route can understand, and redirect them.
-# how would this work with the back button?
-# more importantly, how does the intermediate know the username and trip name
-
 @app.route("/formtest/<username>", methods = ["GET", "POST"])
 def form_output(username: str):
     form = TripCreationForm()
