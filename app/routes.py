@@ -68,7 +68,6 @@ def form_test():
         return redirect(url_for("form_output", text="test1"))
     return render_template("form.html", form=form)
 
-# TESTING
 
 @app.route("/formtest/<username>", methods = ["GET", "POST"])
 def form_output(username: str):
@@ -76,15 +75,6 @@ def form_output(username: str):
     for c in username:
         setattr(form, c, BooleanField())
     return render_template("output.html", form=form)
-
-@app.route("/mr-test/<content>", methods = ["POST"])
-def mr_test(content):
-    pass
-
-@app.route("/intermediate", methods = ["POST"])
-def trip_processor():
-    hs_ids = str(request.form.keys())
-    return make_response(hs_ids)
 
 @app.route("/user/<username>/new-trip")
 def new_trip(username: str):
