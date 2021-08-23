@@ -118,7 +118,7 @@ logging.info("Observations done!")
 logging.info("User start")
 demo_user = User()
 demo_user.UserId = "Demo_User_001"
-demo_user.Email = "***REMOVED***@gmail.com"
+demo_user.Email = "phildavis17@gmail.com"
 demo_user.LoginCount = 0
 session.add(demo_user)
 session.commit()
