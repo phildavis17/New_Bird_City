@@ -7,3 +7,6 @@ __pycache__
 /app/__pycache__
 ignoretest.py
 .scratch.py.swp
+scrape_test.py
+mapscript.js
+ebird_interface.py
