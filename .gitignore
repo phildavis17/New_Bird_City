@@ -9,4 +9,4 @@ ignoretest.py
 .scratch.py.swp
 scrape_test.py
 mapscript.js
-ebird_interface.py
+eBird_interface.py
