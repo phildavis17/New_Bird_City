@@ -42,4 +42,12 @@ ABOUT
 
 
 --== CRUD ==--
+
+
+
+--== POST SCRAPING PLANS ==--
+
+1. User picks a location and a distance threshold
+   - ask ebird for the 10 hotspots with the hightest sp count within the distance from that spot
+   
  

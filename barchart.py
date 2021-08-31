@@ -8,7 +8,7 @@ import json
 import logging
 import math
 import file_manager as fm  # Aliased to prevent circular import
-import eBird_interface as eb
+import eBird_data_fetcher as eb
 
 from pathlib import Path
 
@@ -55,7 +55,7 @@ class Barchart:
         if hasattr(self, "name") and self.name:
             logging.info("Barchart object already has name.")
             return
-        self.name = eb.eBirdInterface.get_hotspot_name(self.loc_id)
+        self.name = eb.get_hotspot_name(self.loc_id)
 
     @staticmethod
     def _read_csv_file(csv_path: Path) -> list:

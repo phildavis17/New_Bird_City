@@ -11,3 +11,5 @@ scrape_test.py
 mapscript.js
 eBird_interface.py
 passwords.txt
+secrets.py
+config_secret.py
