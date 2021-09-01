@@ -1,6 +1,6 @@
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-from db_definitions import Observation, Species, Hotspot, Period
+from app.db_definitions import Observation, Species, Hotspot, Period
 
 engine = create_engine("sqlite:///data/vagrant_db.db")
 Session = sessionmaker()
@@ -58,9 +58,5 @@ def basic_probe():
     print(f"Period: {session.query(Period).first()}")
     print(f"Observation: {session.query(Observation).first()}")
 
-
-basic_probe()
-print()
-print(obs_by_locid_period(PROSPECT_PARK, 0))
-print()
-print(type(obs_by_locid_period(PROSPECT_PARK, 17)))
+if __name__ == "__main__":
+    basic_probe()

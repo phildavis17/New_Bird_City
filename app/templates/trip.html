@@ -2,7 +2,7 @@
 
 {% block head %}
     {# <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='analysisstyle.css') }}"> #}
-    {# <script src="{{ url_for('static', filename='analysisscript.js') }}"></script> #}
+    <script src="{{ url_for('static', filename='tripscript.js') }}"></script>
 {% endblock %}
 
 {% block nav %}
@@ -10,13 +10,17 @@
     <a href="/specialties">See Specialties</a>
 {% endblock %}
 
+{% if not trip_dict %}
+    {% set trip_dict = trip.build_trip_dict() %}
+{% endif %}
+
 {% block content %}
     <div>
         <table id="sp-table" class="table table-striped table-hover table-bordered table-sm">
             <thead>
                 <tr>
                     <th>Species</th>
-                    {% for hotspot in trip.build_trip_dict() %}
+                    {% for hotspot in trip.get_active_hs_names() %}
                         <th class = header-hotspot >{{ hotspot }}</th>
                     {% endfor %}
                     <th>Cumulative</th>
@@ -31,9 +35,9 @@
             {% for bird in  trip.build_trip_sp_list() %}
                 <tr>
                     <td>{{ bird }}</td>
-                    {% for hotspot in trip.build_trip_dict() %}
+                    {% for hotspot in trip_dict %}
                         {#! There's gotta be a way to use some variables in here, right?#}
-                        <td>{{ trip.build_trip_dict()[hotspot][bird] }}</td>
+                        <td>{{ trip_dict[hotspot][bird] }}</td>
                     {% endfor %}
                 </tr>
             {% endfor %}

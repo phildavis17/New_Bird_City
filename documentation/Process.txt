@@ -49,5 +49,8 @@ ABOUT
 
 1. User picks a location and a distance threshold
    - ask ebird for the 10 hotspots with the hightest sp count within the distance from that spot
-   
+2. User selects which ones to include in the Analysis
+   - check to see if current data exists for those hotspots
+   - If not, download fresh data
+   -
  

@@ -86,8 +86,14 @@ class SeenBird(Base):
     AnalysisId = Column(
         Integer, ForeignKey(AnalysisConfig.AnalysisId), primary_key=True
     )
-    SpIndex = Column(Integer, ForeignKey(Species.SpIndex))
+    SpIndex = Column(Integer, ForeignKey(Species.SpIndex), primary_key=True)
 
+
+class KeyBird(Base):
+    __tablename__="KeyBirds"
+    UserId = Column(String(40), ForeignKey(User.UserId), primary_key=True)
+    AnalysisId = Column(Integer, ForeignKey(AnalysisConfig.AnalysisId), primary_key=True)
+    SpIndex = Column(Integer, ForeignKey(Species.SpIndex), primary_key=True)
 
 class DBInterface:
     def __init__(self) -> None:

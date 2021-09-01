@@ -2,7 +2,7 @@ SQLAlchemy
 Flask
 flask-wtf
 requests
-
+bs4
 
 pip-tools
 ipython

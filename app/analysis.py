@@ -287,6 +287,11 @@ class Analysis:
             )
         return seen_birds
 
+    def get_active_hs_names(self) -> list:
+        """Returns a list of the names of the hotspots currently set to active."""
+        return [self.hotspot_names[i] for i, active in enumerate(self.hs_is_active.items()) if active[1]]
+
+
     #  Builtins
     def __len__(self):
         return len(self.hotspot_ids)
