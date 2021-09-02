@@ -49,6 +49,7 @@ class User(Base):
     UserId = Column(String(40), primary_key=True)
     Email = Column(String(100), nullable=False)
     LoginCount = Column(Integer)
+    MostRecentLogin = Column(Float)
 
 
 class Observation(Base):
@@ -68,6 +69,8 @@ class AnalysisConfig(Base):
     AnalysisId = Column(String(100), nullable=False, primary_key=True)
     AnalysisName = Column(String(100))
     PeriodId = Column(Integer, ForeignKey(Period.PeriodId))
+    Latitude = Column(Float)
+    Longitude = Column(Float)
 
 
 class HotspotConfig(Base):
@@ -94,19 +97,6 @@ class KeyBird(Base):
     UserId = Column(String(40), ForeignKey(User.UserId), primary_key=True)
     AnalysisId = Column(Integer, ForeignKey(AnalysisConfig.AnalysisId), primary_key=True)
     SpIndex = Column(Integer, ForeignKey(Species.SpIndex), primary_key=True)
-
-class DBInterface:
-    def __init__(self) -> None:
-        pass
-
-    def sp_name_from_index(sp_index: int) -> str:
-        pass
-
-    def hs_name_from_loc_id(loc_id: str) -> str:
-        pass
-
-    def collect_observations(loc_id: str, period: int) -> dict:
-        pass
 
 
 # Base.metadata.create_all(engine)

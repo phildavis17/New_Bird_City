@@ -25,7 +25,7 @@ def get_hotspot_name(loc_id: str) -> str:
     }
     url = EBIRD_HOTSPOT_API_URL + loc_id
     response = requests.get(url, headers=request_headers)
-    hs_dict = json.loads(response)
+    hs_dict = json.loads(response.text)
     return hs_dict["name"]
 
 def _latlong_str(n: float) -> str:
@@ -57,7 +57,7 @@ def _filter_hotspot_list(raw_hotspots: list) -> list:
     return [(row[loc_id_col], row[name_col], row[sp_count_col]) for row in raw_hotspots if len(row) == 9]
     # ^^^^ 
     # Some hotspots exist in eBird, but have never been visited and have no reported sightings
-    # Since they have no sightings, their entries are only 7 items long
+    # Since they have no sightings or checklists, their entries are only 7 items long
     # That's why this comprehension filters for lines that are 9 items long
 
 

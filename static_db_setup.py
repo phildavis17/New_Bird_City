@@ -15,8 +15,8 @@ from pathlib import Path
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from uuid import uuid4
-from analysis import Analysis
-from db_definitions import (
+from app.analysis import Analysis
+from app.db_definitions import (
     Base,
     Observation,
     Species,
@@ -27,9 +27,17 @@ from db_definitions import (
     HotspotConfig,
 )
 
-DB_PATH = Path(__file__).parent / "data" / "vagrant_db.db"
-assert not DB_PATH.exists()
-engine = create_engine("sqlite:///data/vagrant_db.db")
+DEV_DB = "NBC_DEV_DB.db"
+PROD_DB = ""
+
+target_db = DEV_DB
+
+DB_DEV_PATH = Path(__file__).parent / "data" / target_db
+DB_PROD_PATH = ""
+
+DB_TARGET_PATH = DB_DEV_PATH
+assert not DB_TARGET_PATH.exists()
+engine = create_engine(f"sqlite:///data/{target_db}")
 
 Base.metadata.create_all(engine)
 Base.metadata.bind = engine

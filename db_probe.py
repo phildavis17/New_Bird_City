@@ -1,8 +1,11 @@
+from pathlib import Path
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from app.db_definitions import Observation, Species, Hotspot, Period
 
-engine = create_engine("sqlite:///data/vagrant_db.db")
+TARGET_DB = "NBC_DEV_DB.db"
+
+engine = create_engine(f"sqlite:///data/{TARGET_DB}")
 Session = sessionmaker()
 Session.configure(bind=engine)
 session = Session()
@@ -58,5 +61,27 @@ def basic_probe():
     print(f"Period: {session.query(Period).first()}")
     print(f"Observation: {session.query(Observation).first()}")
 
+def test_update_data():
+    with Session() as sesh:
+        hot = sesh.query(Period).first()
+        print(hot)
+        hot.PeriodId = 1000
+        sesh.commit()
+        hot_again = sesh.query(Period).first()
+        print(hot_again)
+        hot_again.PeriodId = 0
+        sesh.commit()
+        print(sesh.query(Period).filte)
+    
+def update_probe():
+    with Session() as sesh:
+        ps = sesh.query(Period).filter_by(Description = "Late December/Early January").one()
+        ps.PeriodId = 0
+        sesh.commit()
+        for entry in sesh.query(Period):
+            print(entry)
+    
 if __name__ == "__main__":
-    basic_probe()
+    #basic_probe()
+    #test_update_data()
+    update_probe()

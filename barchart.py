@@ -7,6 +7,7 @@ import csv
 import json
 import logging
 import math
+from os import stat
 import file_manager as fm  # Aliased to prevent circular import
 import eBird_data_fetcher as eb
 
@@ -31,22 +32,32 @@ class Barchart:
     @staticmethod
     def new_from_csv(csv_path):
         """Returns a new Barchart object containing the data from the specified .csv file."""
+        row_data = Barchart._read_csv_file(csv_path)
         new_barchart = Barchart()
-        new_barchart.ingest_csv(csv_path)
+        new_barchart.ingest_csv_data(row_data)
+        new_barchart.loc_id = Barchart.loc_id_from_ebird_barchart(csv_path)
         return new_barchart
 
-    def ingest_csv(self, csv_path: Path) -> None:
+    def ingest_csv_data(self, row_list: list) -> None:
         """Populates Barchart data from a provided eBird barchart file."""
-        row_list = self._read_csv_file(csv_path)
         samps = [int(float(x)) for x in row_list[self.BC_FILE_SAMP_SIZE_ROW][1:] if x]
         obs = {}
         for row in self.filter_observation_rows(row_list[self.BC_FILE_OBS_START_ROW :]):
             sp_name = self.clean_sp_name(row[0])
             obs[sp_name] = [float(x) for x in row[1:] if x]
-        self.loc_id = self.loc_id_from_ebird_barchart(csv_path)
+        #self.loc_id = self.loc_id_from_ebird_barchart(csv_path)
         self.samp_sizes = samps
         self.observations = obs
         self._get_name()
+
+    @staticmethod
+    def new_from_ebird_fetch(loc_id: str) -> "Barchart":
+        """Returns a new Barchart object containing data from a CSV direct from ebird."""
+        new_barchart = Barchart()
+        new_barchart.ingest_csv_data(eb.fetch_hotspot_barchart(loc_id))
+        new_barchart.loc_id = loc_id
+        return new_barchart
+
 
     def _get_name(self):
         """Gives itself a Name attribute."""
