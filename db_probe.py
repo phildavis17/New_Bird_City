@@ -1,7 +1,9 @@
+from sqlalchemy.sql.expression import delete
+from app.analysis import Analysis
 from pathlib import Path
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, delete
 from sqlalchemy.orm import sessionmaker
-from app.db_definitions import Observation, Species, Hotspot, Period
+from app.db_definitions import AnalysisConfig, HotspotConfig, Observation, Species, Hotspot, Period
 
 TARGET_DB = "NBC_DEV_DB.db"
 
@@ -80,8 +82,28 @@ def update_probe():
         sesh.commit()
         for entry in sesh.query(Period):
             print(entry)
+
+def show_analyses():
+    with Session() as sesh:
+        ans = sesh.query(AnalysisConfig)
+        for a in ans:
+            print(f"{a.AnalysisName}: {a.AnalysisId}")
+
+def delete_analysis(id: str):
+    with Session() as sesh:
+        hot_list = []
+        hot_list.append(sesh.query(AnalysisConfig).filter_by(AnalysisId=id).one())
+        for result in sesh.query(HotspotConfig).filter_by(AnalysisId=id):
+            hot_list.append(result)
+        for item in hot_list:
+            sesh.delete(item)
+        sesh.commit()
+        
     
 if __name__ == "__main__":
     #basic_probe()
     #test_update_data()
-    update_probe()
+    #update_probe()
+    show_analyses()
+    delete_analysis("ba832cd0-aed7-4528-80dd-b8ee68abdb5d")
+    show_analyses()

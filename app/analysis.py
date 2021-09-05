@@ -3,16 +3,19 @@
 # import file_manager as fm
 # import eBird_interface as eb
 import logging
+from os import write
 import random
 import uuid
 
 from collections import defaultdict
 from typing import Iterable, Union
 
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, delete
 from sqlalchemy.orm import Session, raiseload, sessionmaker
 from app.db_definitions import (
     Observation,
+    SeenBird,
+    KeyBird,
     Species,
     Hotspot,
     # Period,
@@ -104,6 +107,49 @@ def build_analysis(session: Session, analysis_id: str) -> "Analysis":
     name = q.first().AnalysisName
     locs = get_analysis_loc_ids(session, analysis_id)
     return Analysis(locs, period, name)
+
+def update_analysis(session: Session, in_analysis: "Analysis"):
+    delete_analysis(session, str(in_analysis.analysis_id))
+    write_analysis(session, in_analysis)
+
+def write_analysis(session: Session, in_analysis: "Analysis") -> None:
+    """Writes the contents of a supplied Analysis object to the database."""
+    new_a_config = AnalysisConfig()
+    # username will go here
+    new_a_config.AnalysisId = in_analysis.analysis_id
+    new_a_config.AnalysisName = in_analysis.name
+    new_a_config.PeriodId = in_analysis.period
+    session.add(new_a_config)
+    for loc in in_analysis.hotspot_ids:
+        new_hs_config = HotspotConfig()
+        #!username
+        new_hs_config.AnalysisId = in_analysis.analysis_id
+        new_hs_config.LocId = loc
+        new_hs_config.IsActive = in_analysis.hs_is_active[int(loc)]
+        session.add(new_hs_config)
+    session.commit()
+
+
+def delete_analysis(session: Session, analysis_id: str) -> None:
+    """Deletes records associated witht the supplied analysis id from the database."""
+    # There's GOT to be a better way to do this!
+    # select from all tables if there's an a_id record and it matches this one?
+    # splatting query results instead of looping through them every time?
+    #! is_deleted flag, just in case
+    hot_items = []
+    hot_items.append(session.query(AnalysisConfig).filter_by(AnalysisId=analysis_id).one())
+    q = session.query(HotspotConfig).filter_by(AnalysisId=analysis_id)
+    for item in q:
+        hot_items.append(item)
+    q = session.query(SeenBird).filter_by(AnalysisId=analysis_id)
+    for item in q:
+        hot_items.append(item)
+    q = session.query(KeyBird).filter_by(AnalysisId=analysis_id)
+    for item in q:
+        hot_items.append(item)
+    for item in hot_items:
+        session.delete(item)
+    session.commit()
 
 
 class Analysis:
