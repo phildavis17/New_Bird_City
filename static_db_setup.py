@@ -202,6 +202,8 @@ for a in DEMO_ANALYSES:
     this_a_config.AnalysisId = a_id
     this_a_config.AnalysisName = name
     this_a_config.PeriodId = p
+    this_a_config.Latitude = 0.0
+    this_a_config.Longitude = 0.0
     session.add(this_a_config)
     for loc in locs:
         this_hs_config = HotspotConfig()

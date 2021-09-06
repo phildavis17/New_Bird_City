@@ -10,7 +10,7 @@ from app.forms import MyForm, TripCreationForm
 
 # from app.analysis import Analysis
 
-engine = create_engine("sqlite:///data/vagrant_db.db")
+engine = create_engine("sqlite:///data/NBC_DEV_DB.db")
 Session = sessionmaker()
 Session.configure(bind=engine)
 session = Session()
@@ -25,7 +25,7 @@ def index():
 
 @app.route("/about")
 def about():
-    return "New Bird City helps you get ready to see birds."
+    return render_template("about.html")
 
 
 @app.route("/user/<username>")
@@ -42,10 +42,11 @@ def trip_page(username: str, tripid: str):
     user = {"username": username}    
     with session as trip_session:
         trip = analysis.build_analysis(trip_session, tripid)
-        trip.analysis_id = tripid
+        trip.analysis_id = str(tripid)
         if request.method == "POST":
             trip.set_hs_active_by_id(list(request.form.keys()))
-            return redirect(url_for("trip_details_page", username=username, tripid=tripid, hsbv=trip.get_current_bv()))
+            return redirect(url_for("about"))
+            #return redirect(url_for("trip_details_page", username=username, tripid=tripid, hsbv=trip.get_current_bv()))
     return render_template("analysis.html", user=user, trip=trip)
 
 
