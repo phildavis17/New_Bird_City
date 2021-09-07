@@ -9,6 +9,9 @@
     <a href="{{ url_for('user_page', username=user.username) }}">Back to my trips</a>
 {% endblock %}
 
+{% set current_trip_id = trip.trip_id %}
+
+
 {% block content %}
 <form action="{{ url_for('trip_page', username=user.username, tripid=trip.trip_id) }}" method="POST" id="trip_creation_form"></form>
 <table id="sp-table" class="table table-striped table-hover table-bordered table-sm">

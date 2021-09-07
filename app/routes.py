@@ -44,8 +44,8 @@ def trip_page(username: str, tripid: str):
         trip = analysis.build_analysis(trip_session, tripid)
         trip.analysis_id = str(tripid)
         if request.method == "POST":
+            return "Post!"
             trip.set_hs_active_by_id(list(request.form.keys()))
-            return redirect(url_for("about"))
             #return redirect(url_for("trip_details_page", username=username, tripid=tripid, hsbv=trip.get_current_bv()))
     return render_template("analysis.html", user=user, trip=trip)
 

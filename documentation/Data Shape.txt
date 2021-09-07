@@ -129,3 +129,55 @@ Users
 -Email
 -LoginCount
 
+
+
+CRUD Planning
+
+Barchart
+-Owns:
+ - Hotspot
+  - C/U: write_hotspot_to_db()
+  - U: update_hotspot_timestamp()
+  - R: 
+   - find_out_of_date_hotspots()
+   - find_hotspot_by_name()
+  - D:
+ - Period
+  - C/U: write_periods_do_db()
+  - *******Does this really need other stuff**********
+ - Observation
+  - C: add_hs_observations_to_db()
+  - U: update_hs_observations
+  - R: ***I think this is already done***
+  - D: delete_hs_obdervations()
+
+
+Analysis
+-Owns
+ - AnalysisConfig
+  - C: part of create_analysis()
+  - R: *done*
+  - U: part of edit_analysis()
+  - D: part of delete_analysis()
+ - HotspotConfig
+  - C: part of create_analysis()
+  - R: *done*
+  - U: part of edit_analysis()
+  - D: part of delete_analysis()
+ - SeenBird
+  - C: Set Seen Birds
+  - R:
+  - U:
+  - D:
+ - KeyBird
+  - C:
+  - R:
+  - U:
+  - D:
+
+
+  Approaches:
+
+  If it's not there, add it
+  If it's there, remove it
+  Wipe everything, add everything.
