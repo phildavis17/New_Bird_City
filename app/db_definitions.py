@@ -65,7 +65,7 @@ class Observation(Base):
 
 class AnalysisConfig(Base):
     __tablename__ = "Analyses"
-    UserId = Column(String(40), ForeignKey(User.UserId), primary_key=True)
+    UserId = Column(String(40), ForeignKey(User.UserId), nullable=False, primary_key=True)
     AnalysisId = Column(String(100), nullable=False, primary_key=True)
     AnalysisName = Column(String(100))
     PeriodId = Column(Integer, ForeignKey(Period.PeriodId))

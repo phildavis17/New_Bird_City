@@ -89,6 +89,17 @@ def show_analyses():
         for a in ans:
             print(f"{a.AnalysisName}: {a.AnalysisId}")
 
+def show_hotspots():
+    with Session() as sesh:
+        hs_list = sesh.query(Hotspot)
+        for hs in hs_list:
+            print(f"{hs.LocId}: {hs.Name} - {hs.Timestamp}")
+
+def show_hotspot(loc_id: str) -> None:
+    with Session() as sesh:
+        hs = sesh.query(Hotspot).filter_by(LocId=loc_id).one()
+        print(f"{hs.LocId}: {hs.Name} - {hs.Timestamp}")
+
 def delete_analysis(id: str):
     with Session() as sesh:
         hot_list = []
@@ -104,6 +115,8 @@ if __name__ == "__main__":
     #basic_probe()
     #test_update_data()
     #update_probe()
-    show_analyses()
-    delete_analysis("ba832cd0-aed7-4528-80dd-b8ee68abdb5d")
-    show_analyses()
+    #show_analyses()
+    #delete_analysis("ba832cd0-aed7-4528-80dd-b8ee68abdb5d")
+    #show_analyses()
+    #show_hotspots()
+    show_hotspot("L2714552")

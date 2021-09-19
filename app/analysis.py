@@ -23,7 +23,7 @@ from app.db_definitions import (
     HotspotConfig,
 )
 
-logging.basicConfig(level=logging.WARNING)
+logging.basicConfig(level=logging.DEBUG)
 
 ENGINE = create_engine("sqlite:///data/vagrant_db.db")
 Session = sessionmaker()
@@ -58,9 +58,10 @@ def obs_dict_from_db(session: Session, loc_id: str, period: int) -> dict:
 
 def hs_name_from_loc_id(session: Session, loc_id: str) -> str:
     """Returns the Hotspot name associated with the supplied loc id in the databse."""
-    q = session.query(Hotspot).filter(Hotspot.LocId == loc_id)
+    logging.debug(f"Attempting {loc_id}")
+    q = session.query(Hotspot).filter_by(LocId=loc_id).one()
     logging.debug(f"{loc_id=}")
-    return q[0].Name
+    return q.Name
 
 
 def report_val(obs_val: float, precision=1) -> str:
@@ -108,24 +109,29 @@ def build_analysis(session: Session, analysis_id: str) -> "Analysis":
     locs = get_analysis_loc_ids(session, analysis_id)
     return Analysis(locs, period, name)
 
+
 def update_analysis(session: Session, in_analysis: "Analysis"):
     delete_analysis(session, str(in_analysis.analysis_id))
     write_analysis(session, in_analysis)
 
-def write_analysis(session: Session, in_analysis: "Analysis") -> None:
+
+def write_analysis(session: Session, username: str, in_analysis: "Analysis") -> None:
     """Writes the contents of a supplied Analysis object to the database."""
     new_a_config = AnalysisConfig()
-    # username will go here
+    #! Temp
+    new_a_config.UserId = "Demo_User_001"
     new_a_config.AnalysisId = in_analysis.analysis_id
     new_a_config.AnalysisName = in_analysis.name
     new_a_config.PeriodId = in_analysis.period
+    new_a_config.Latitude = in_analysis.lat
+    new_a_config.Longitude = in_analysis.long
     session.add(new_a_config)
     for loc in in_analysis.hotspot_ids:
         new_hs_config = HotspotConfig()
-        #!username
+        new_hs_config.UserId = username
         new_hs_config.AnalysisId = in_analysis.analysis_id
         new_hs_config.LocId = loc
-        new_hs_config.IsActive = in_analysis.hs_is_active[int(loc)]
+        new_hs_config.IsActive = int(in_analysis.hs_is_active[loc])
         session.add(new_hs_config)
     session.commit()
 
@@ -158,9 +164,11 @@ class Analysis:
         self.user_id = (
             "DEMO_USER_001"  # FIXME: once user functionality is added, fix this.
         )
-        self.analysis_id = uuid.uuid4()
+        self.analysis_id = str(uuid.uuid4())
         self.name = name
         self.period = period
+        #! Temp
+        self.lat, self.long = 0.0, 0.0
         self.hs_is_active = {loc_id: True for loc_id in self.hotspot_ids}
         with Session() as init_session:
             self.observations = {
@@ -366,12 +374,6 @@ if __name__ == "__main__":
 
     PROSPECT_PARK = "L109516"
     PLUMB_BEACH = "L444485"
-
-    # with Session() as this_session:
-    #    print(hs_name_from_loc_id(this_session, PROSPECT_PARK))
-    #    print(obs_dict_from_db(this_session, PROSPECT_PARK, 1))
-    #    print(sp_index_from_name(this_session, "Common Ostrich"))
-
     BKHS = [
         "L109145",
         "L109516",
@@ -381,36 +383,13 @@ if __name__ == "__main__":
         "L385839",
         "L444485",
     ]
-    # bk = Analysis(BKHS, 17, "Brooklyn, baby")
-    # print(bk)
-    # for park, obs in bk.observations.items():
-    #    print(park)
-    #    print(bk.report_dict(obs))
-    # print(bk.report_dict(bk.get_sp_obs("Snow Goose")))
-    # print(bk.report_dict(bk.build_cumulative_obs_dict()))
-    # bk.hs_is_active[PROSPECT_PARK] = False
-    # print(bk.report_dict(bk.build_cumulative_obs_dict()))
-    # bk.hs_is_active[PROSPECT_PARK] = True
-    # print("SPECIALTIES")
-    # print("Prospect Park:")
-    # print(bk._find_hs_specialties(PROSPECT_PARK))
-    # print("Plumb Beach")
-    # print(bk._find_hs_specialties(PLUMB_BEACH))
-    # print(bk.simulate(bk.observations))
-    # for _ in range(10):
-    #    print(len(bk.simulate(bk.observations)))
+
     with Session() as test_session:
         ids = get_analysis_loc_ids(test_session, "c322d36f-048e-4b5c-9adf-a6640fd1f050")
         for hs in ids:
             print(hs)
             print(hs_name_from_loc_id(test_session, hs))
-        # hs_q = test_session.query(Hotspot)
-        # for hs in hs_q:
-        #    print(f"{hs.LocId}: {hs.Name}")
-        # an_q = test_session.query(AnalysisConfig)
-        # print(an_q.count())
-        # for a in an_q:
-        #    print(f"{a.AnalysisName}: {a.AnalysisId}")
+
         test_analysis = build_analysis(
             test_session, "c322d36f-048e-4b5c-9adf-a6640fd1f050"
         )

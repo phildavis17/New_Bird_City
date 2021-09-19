@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <form action="{{ url_for('cheap_trip', username=user.username) }}" method="POST" id="cheap-trip-form">
+        <fieldset>
+            <legend>Trip Creation Form</legend>
+            <p>                
+                <label for="trip-name-input">Trip Name:</label><br>
+                <input type="text" name="trip-name" form="cheap-trip-form" id="trip-name-input">
+            </p>
+            <p>
+                <label for="period-select">Select a period:</label><br>
+                <select name="trip-period" id="period-select" form="cheap-trip-form">
+                    <option value="---"></option>
+                    {% for p in periods %}
+                        <option value="{{ p }}">{{ p }}</option>
+                    {% endfor %}
+                </select>
+            </p>
+            <p>
+                <table id="loc-id-table">
+                    <thead>
+                        <tr>
+                            <th>Loc ID</th>
+                            <th>Included?</th>
+                        </tr>
+                        {% for hs in locs %}
+                            <tr>
+                                <td><label for="{{ hs }}">{{ hs }}</label></td>
+                                <td><input type="checkbox" name="{{ hs }}" id="{{ hs }}" form="cheap-trip-form"></td>
+                            </tr>
+                        {% endfor %}
+                    </thead>
+                </table>
+            </p>
+            <input type="submit" value="Create Trip" form="cheap-trip-form">
+        </fieldset>
+    </form>
+{% endblock %}
